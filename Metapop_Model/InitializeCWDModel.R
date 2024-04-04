@@ -7,7 +7,7 @@ rm(list = ls())
 ####Set directories
 #####################
 # setwd("~/Desktop/IBM_files/Metapop Model") #for my Mac
-setwd("C:/Users/SIU856560341/Desktop/Metapop Model") #for my PC
+setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop Model") #for my PC
 
 ######################
 ####Set libraries
