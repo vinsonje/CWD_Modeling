@@ -1,6 +1,7 @@
 GetOutputsCWD = function(pop, Incidence, out, 
 										 I_locs, POSlive_locs, 
-										 Isums, landscape.prions, Nall){
+										 Isums, landscape.prions, Nall,
+										 pop.out){
 	
 #List of outputs created here:	
 	#Tinc #sum of all exposures over simulation 
@@ -31,6 +32,9 @@ DET = sum(unlist(POSlive_locs))
 #total population
 total.pop = data.frame(time = 1:length(Nall), pop = Nall)
 
+pop.out = as.data.frame(pop.out)
+names(pop.out) = c("fam.size", "dis.status", "grid.loc", "move.dis", "x.now", "y.now", "prev.loc", "S.num", "E.num", "I.num", "Z.num", "time")
+
 #send to list
 list.all = list("Tinc" = Tinc,
 							"idT" = idT,
@@ -41,7 +45,8 @@ list.all = list("Tinc" = Tinc,
 							"POSlive_locs" = POSlive_locs,
 							"Isums" = Isums, 
 							"land.prions" = landscape.prions,
-							"tot.abun" = total.pop)
+							"tot.abun" = total.pop,
+							"pop.out" = pop.out)
 
 return(list.all)
 

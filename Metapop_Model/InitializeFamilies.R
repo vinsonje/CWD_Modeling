@@ -20,34 +20,34 @@ InitializeFamilies<-function(N0, fs, cells, centroids, type, init_locs, n){
     #each row is a family
     
     fam.size = rpois(fn,fs) #family size with avg as lambda in a poisson
-    dis.status = 0 #
+    dis.status = rep(0, fn) #
     grid.loc = init_locs #this will be grid location (row number)
-    move.dis = 0 #this will be assigned movement distance
+    move.dis = rep(0, fn) #this will be assigned movement distance
     x.now = centroids[grid.loc, 1] #present location X 
     y.now = centroids[grid.loc, 2] #present location Y
-    prev.loc = 0 #previous location (grid row number)
+    prev.loc = rep(0, fn) #previous location (grid row number)
     S.num = fam.size #number of S status in family (susceptible)
-    E.num = 0 #number of E status in family (exposed)
-    I.num = 0 #number of I status in family (infectious)
-    Z.num = 0 #number of Z status in family (dead)
+    E.num = rep(0, fn) #number of E status in family (exposed)
+    I.num = rep(0, fn) #number of I status in family (infectious)
+    Z.num = rep(0, fn) #number of Z status in family (dead)
     
-    pop =  data.frame(fam.size, dis.status, grid.loc, move.dis, x.now, y.now, prev.loc, S.num, E.num, I.num, Z.num)
+    pop =  matrix(c(fam.size, dis.status, grid.loc, move.dis, x.now, y.now, prev.loc, S.num, E.num, I.num, Z.num), byrow = FALSE, ncol = 11)
     
   } else{ 
     
     fam.size = n #family size with avg as lambda in a poisson
-    dis.status = 0 #this will be disease status
+    dis.status = rep(0, 1) #this will be disease status
     grid.loc = init_locs #this will be grid location (row number)
-    move.dis = 0 #this will be assigned movement distance
+    move.dis = rep(0, 1) #this will be assigned movement distance
     x.now = centroids[grid.loc,1] #present location X 
     y.now = centroids[grid.loc,2] #present location Y
-    prev.loc = 0 #previous location (grid row number)	
+    prev.loc = rep(0, 1) #previous location (grid row number)	
     S.num = fam.size #number of S status in family (susceptible)
-    E.num = 0 #number of E status in family (exposed)
-    I.num = 0 #number of I status in family (infectious)
-    Z.num = 0 #number of Z status in family (dead)
+    E.num = rep(0, 1) #number of E status in family (exposed)
+    I.num = rep(0, 1) #number of I status in family (infectious)
+    Z.num = rep(0, 1) #number of Z status in family (dead)
     
-    pop =  data.frame(fam.size, dis.status, grid.loc, move.dis, x.now, y.now, prev.loc, S.num, E.num, I.num, Z.num)
+    pop =  matrix(c(fam.size, dis.status, grid.loc, move.dis, x.now, y.now, prev.loc, S.num, E.num, I.num, Z.num), byrow = FALSE, ncol = 11)
     
   }
   

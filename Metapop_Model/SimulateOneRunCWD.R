@@ -4,7 +4,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
                          F1, F2_int, F2i_B, B1, B2,
                          thyme, cells, N0, K,
                          shift, centroids, inc, fs,
-                         gridlen, midpoint, pop, I0){
+                         midpoint, pop, I0){
 
   ###########################################
   ######## Initialize Output Objects ######## 
@@ -47,23 +47,27 @@ SimulateOneRunCWD = function(Pbd, death, shed,
   #track first infection in Incidence matrix
   Incidence[1] = num_inf_0
   
-  Nall[1] = sum(pop$fam.size)
+  Nall[1] = sum(pop[,1])
+  
+  pop.out = cbind(pop, rep(1,dim(pop)[1]))
   
   ##################################
   ######## Start simulation ######## 
   ##################################
   #start the timestep loop
-  i=2
+
+  i = 2
   
-  ##detectday=i
-  
-  for(i in 1:thyme){
+  for(i in 2:thyme){
     if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
       
       print(i)
+      print(pop)
+      
       #####################################
       ######## Track I locations ######## 
       #####################################
+      print("tracking I locations")
       if(nrow(pop[pop[, 10] > 0, ,drop = FALSE]) > 0){
         Isums[i] = nrow(pop[pop[, 10] > 0, , drop = FALSE])
       } else{Isums[i] = 0}
@@ -77,12 +81,13 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       ##########################
       ######## Movement ######## 
       ##########################
-      
-      pop = as.data.frame(FastMovementCWD(as.matrix(pop), as.matrix(centroids), shift, inc)) 
+      print("starting movement")
+      pop = FastMovementCWD(pop, centroids, shift, inc)
       
       ###############################
       ######## State Changes ######## 
       ###############################
+      print("starting state changes")
       #births, natural deaths, disease state changes (exposure, infection, recovery, death), carcass decay
       st.list = StateChangesCWD(pop, centroids, cells, 
                                 Pbd,
@@ -96,15 +101,16 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       ################################
       ####### Shedding ###############
       ################################
+      print("starting shedding")
       Imat = pop[pop[,10] > 0, , drop = FALSE]
       
       if(dim(Imat)[1]>0){
         
       for(k in 1:dim(Imat)[1]){
         
-        prions.shed = rpois(Imat[k,]$I.num, shed)
+        prions.shed = rpois(Imat[k,9], shed)
         
-        land.index = intersect(which(landscape.prions$cent.x == Imat[k,]$x.now), which(landscape.prions$cent.y == Imat[k,]$y.now))
+        land.index = intersect(which(landscape.prions$cent.x == Imat[k,5]), which(landscape.prions$cent.y == Imat[k,6]))
         
         landscape.prions[land.index,]$prions = landscape.prions[land.index, ]$prions + sum(prions.shed)
       }
@@ -114,6 +120,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       ################################
       ####### Removal of prions#######
       ################################
+      print("starting prions removal")
       for(l in 1:dim(landscape.prions)[1]){
         landscape.prions$prions[l] = floor(landscape.prions$prions[l] * 0.25) #this should be a parameter in the model
       }
@@ -124,6 +131,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       #############################
       ####Track true spatial spread
       #############################
+      print("starting true spatial spread")
       #if any infected individuals
       if(nrow(pop[pop[, 9, drop = FALSE] > 0 | pop[ , 10, drop = FALSE] > 0, , drop = FALSE]) > 0){
         
@@ -134,6 +142,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       #############################
       ####Summarize infections
       #############################
+      print("summarizing infections")
       #sum all infectious cases (I,C,E) at each timestep
       #Itrue = sum(I + C,2); sum of all infectious cases over time
       if(i==1){Itrue[i] = num_inf_0}
@@ -144,8 +153,10 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       #############################
       ####Summarize total population size
       #############################
-      Nall[i] = sum(pop$fam.size)
-      
+      print("summarizing total population size")
+      Nall[i] = sum(pop[,1])
+      pop.temp = cbind(pop, time = i)
+      pop.out = rbind(pop.out, pop.temp)
       
       #comment brackets below for manual testing
     }else{print("Exiting loop, no infections")} #if any infected closing bracket/else
@@ -156,11 +167,12 @@ SimulateOneRunCWD = function(Pbd, death, shed,
   #############################
   
   
-  
+  print("calculating outputs")
   out.list = GetOutputsCWD(pop, Incidence, out,
                        I_locs, 
                        POSlive_locs, Isums,
-                       landscape.prions.out, Nall)
+                       landscape.prions.out, Nall,
+                       pop.out)
 
   return(out.list)
 

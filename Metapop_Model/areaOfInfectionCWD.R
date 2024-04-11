@@ -27,7 +27,7 @@ ch = chull(xy)
 boundary = xy[ch,,drop = FALSE]
 
 #get area within boundary
-A = abs(polyarea(boundary$cent.x, boundary$cent.y))
+A = abs(polyarea(boundary[,1], boundary[,2]))
 
 
 maxdist = max(pdist(xy))

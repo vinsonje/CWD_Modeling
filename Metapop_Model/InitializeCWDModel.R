@@ -1,5 +1,6 @@
 #The purpose of this script is to set all the parameters 
 #and initialize all state variables needed to run the CWD metapopulation Model
+#It will also do one run of the simulation using SimulateOneRun.R
 #Run this before running SimulateOneRun.R
 
 rm(list = ls())
@@ -7,7 +8,7 @@ rm(list = ls())
 ####Set directories
 #####################
 # setwd("~/Desktop/IBM_files/Metapop Model") #for my Mac
-setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop Model") #for my PC
+setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model") #for my PC
 
 ######################
 ####Set libraries
@@ -31,26 +32,26 @@ source(paste(getwd(), "/CWDSourcer.R", sep = ''))
 
 ######################
 ####Define Parameters
-#####################
+###################
 thyme = 70
 
 #grid/landscape parameters
 grid.xmax = 20
 grid.ymax = 20
-cell.x.size = 0.5
-cell.y.size = 0.5
-density = 6 #density per X
+cell.x.size = 0.4
+cell.y.size = 0.4
+density = 10 #density per X
 area = grid.xmax * grid.ymax #total area of the grid
 
 #host demographic parameters
 N0 = density*area #initial population size
-K = N0*1.5 #carrying capacity for whole population
-fs = 4
+K = floor(N0*1.5) #carrying capacity for whole population
+fs = 12
 death = 7/(365*3) #assume pop growth rate of 1.5 so make death rate = birth rate*(1/1.5); 1/(365*3); % natural death rate for S and R
 mc_time=0.0027
 Pbd = 7*mc_time #; %repmat(mean(c_time(1:364/7)),time,1).*1; % constant birth rate for S; rescale trend as needed to produce realistic pop dynamics
-shift = c(0.7515,0.3550) #you pulled this from the other file. I think it has something to do with gamma distribution. Maybe mean and sd?
-inc = 0.5
+shift = c(2.0,0.3550) #you pulled this from the other file. I think it has something to do with gamma distribution. Maybe mean and sd?
+inc = 0.4
 
 shed = 20
 
@@ -59,6 +60,7 @@ shed = 20
 ####Create grid
 ######################
 grid = create.grid(grid.xmax, grid.ymax, cell.x.size, cell.y.size)
+# grid = readMat("Grid_80x80_0pt4km.mat")$grid
 
 centroids = grid[,6:7]
 cells = nrow(grid)
@@ -85,7 +87,7 @@ B2 = 0.5*0.2
 n_sim = 10000           # for the initial dataset
 
 xx = runif(n_sim)     # predictor values
-coefficients = c(-0.80094,-1.9128) # my assumption
+coefficients = c(0.98, 1.9128) # my assumption
 prob = 1/(1 + exp(-(coefficients[1] + coefficients[2] * xx)))
 
 yy = runif(n_sim) < prob
@@ -104,16 +106,16 @@ I0 = 1
 ######################
 ####RunModel
 #####################
-for(z in 1:1){
-  print("starting new simulation")
-sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters realated to population and epi model
+# for(z in 1:1){
+#   print("starting new simulation")
+sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters related to population and epi model
                            F1, F2_int, F2_B, B1, B2,
                            thyme, cells,
                            N0, K, #population parameters
                            shift, centroids, inc, fs,
-                           gridlen,midpoint,
+                           midpoint,
                            pop, I0)
-}
+# }
 #output is a list with 
 # [1] Total infected/incidence
 # [2] Time of last infected
@@ -124,6 +126,4 @@ sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters realated t
 # [7] Locations of positive IDs
 # [8] Total number of infected at each time point
 
-
-plot.landscape.meta(sim_output, grid.xmax = grid.xmax, grid.ymax = grid.ymax)
 

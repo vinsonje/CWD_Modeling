@@ -1,7 +1,7 @@
 FastMovementCWD = function(pop,centroids,shift,inc){
 
 #get distances from gamma distribution
-pop[,4] = rgamma(nrow(pop),shape=shift[1],scale=shift[2])
+pop[,4] = rgamma(nrow(pop), shape=shift[1], scale=shift[2])
 
 #set those less than inc to 0
 pop[pop[,4] < inc,][,4]=0 
@@ -10,7 +10,6 @@ pop[pop[,4] < inc,][,4]=0
 pop[,7] = pop[,3]
 
 m1 = parallelMovementRcpp_portion(pop,pop[,1,drop=FALSE],pop[,3,drop=FALSE],centroids) #this determines the cell id of where the family moved to. 
-#not sure what happens to the families that occupy the same cell? Do they combine? 
 
 pop[,3] = m1 #assign new cell id 
 
