@@ -1,9 +1,14 @@
 ########################################
-#Sharpshooting
+#Sharpshooting function
 ########################################
 #The purpose of this function is to simulate
 #sharpshooting on a landscape. It has inputs of:
-#
+#pop = population matrix
+#centroids = centroids matrix
+#ss.loc = vector of grid ids where SS happens
+#ss.time = vector of times when SS happens
+#ss.radius = the radius around the cells centroid where SS is effective
+#thyme = the current time of the simulation
 #########################################
 
 sharpshootingCWD = function(pop, centroids, ss.loc, ss.time, ss.radius, thyme){
@@ -11,7 +16,7 @@ sharpshootingCWD = function(pop, centroids, ss.loc, ss.time, ss.radius, thyme){
   pop.out = pop
   print(dim(pop.out)[1])
   
-  if(ss.time == thyme){
+  if(thyme %in% ss.time){
   for(q in 1:length(ss.loc)){
     ss.loc.id.now = ss.loc[q]
     ss.loc.xloc.now = centroids[ss.loc.id.now, 1]
@@ -45,13 +50,13 @@ sharpshootingCWD = function(pop, centroids, ss.loc, ss.time, ss.radius, thyme){
 }#end of function
 
 
-ss.loc = c(11, 265)
-ss.time = 10
-ss.radius = 1.0
-
-thyme = 12
-
-test.pop = pop
-
-ss.test = sharpshootingCWD(test.pop, centroids, ss.loc, ss.time, ss.radius, thyme)
+# ss.loc = c(11, 265)
+# ss.time = 10
+# ss.radius = 1.0
+# 
+# thyme = 12
+# 
+# test.pop = pop
+# 
+# ss.test = sharpshootingCWD(test.pop, centroids, ss.loc, ss.time, ss.radius, thyme)
 

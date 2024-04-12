@@ -11,4 +11,5 @@ ggplot(pop.time) + geom_histogram(aes(move.dis), bins = 100) + facet_wrap(~time)
 
 pop.final = pop.time[which(pop.time$time==70),]
 
-# ggplot(pop.final)
+#Looking at the number of families through time
+table(pop.time$time)

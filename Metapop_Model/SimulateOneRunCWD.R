@@ -4,7 +4,8 @@ SimulateOneRunCWD = function(Pbd, death, shed,
                          F1, F2_int, F2i_B, B1, B2,
                          thyme, cells, N0, K,
                          shift, centroids, inc, fs,
-                         midpoint, pop, I0){
+                         midpoint, pop, I0, 
+                         ss.loc, ss.time, ss.radius){
 
   ###########################################
   ######## Initialize Output Objects ######## 
@@ -127,6 +128,11 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       
       landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
       landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
+      
+      ###############################
+      #### Sharpshooting ############
+      ###############################
+      pop = sharpshootingCWD(pop, centroids, ss.loc, ss.time, ss.radius, thyme)
       
       #############################
       ####Track true spatial spread
