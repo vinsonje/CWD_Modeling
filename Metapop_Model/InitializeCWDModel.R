@@ -120,7 +120,7 @@ ss.times = c(30, 60)
 ss.radius = 5.0
 
 
-######################
+#####################
 ####RunModel
 #####################
 sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters related to population and epi model

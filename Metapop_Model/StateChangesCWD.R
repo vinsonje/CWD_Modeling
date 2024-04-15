@@ -85,7 +85,8 @@ StateChangesCWD = function(pop, centroids, cells,
   ######## Determine disease state change probabilities ######## 
   ##############################################################
   
-  Pse = FOICWD(pop, centroids, cells ,B1, F1, F2) #force of infection #R version
+  # Pse = FOICWD(pop, centroids, cells ,B1, F1, F2) #force of infection #R version
+  Pse = FOIParallelFullCWD(pop, centroids, cells, B1, B2, F1, F2_int, F2_B) #C++ version
   #Pse is the probability of becoming infected for each individual in each family
 
   Pei = 1 - exp(-1/rpois(nrow(pop), 4)/7) #transitions exposure to infected
