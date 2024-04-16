@@ -40,8 +40,8 @@ source(paste(getwd(), "/CWDSourcer.R", sep = ''))
 thyme = 70
 
 #grid/landscape parameters
-grid.xmax = 80
-grid.ymax = 80
+grid.xmax = 20
+grid.ymax = 20
 cell.x.size = 0.5
 cell.y.size = 0.5
 density = 10 #density per X

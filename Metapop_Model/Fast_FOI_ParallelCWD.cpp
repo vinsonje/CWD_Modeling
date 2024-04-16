@@ -283,8 +283,11 @@ NumericMatrix parallelFOI(
   //output is output matrix defined above
   FOILoop foiloop(Imat,Pmat,cent,pdI_1,pdP_1,B_I,W_I,B_P,W_P,B1,B2,F1,F2_int,F2_B,F1P,F2P_int,F2P_B,B_tot);
   
+  int centNrow = cent.nrow(); 
   
-  parallelFor(0,cent.nrow(), foiloop);
+  Rcout << centNrow;
+  
+  parallelFor(0, centNrow, foiloop);
   
   // return the output matrix
   return B_tot;
