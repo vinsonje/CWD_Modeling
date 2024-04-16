@@ -181,10 +181,13 @@ struct FOILoop : public Worker {
     //needed output: arma::mat Btot(cells,2)
     for(std::size_t j = begin; j < end; j++) {
       
+      //Rcout << "infected ind. j=" << j << "\n";
+      
       //if any infected rows in Imat
       if(Imat3.n_rows > 0){
         for(std::size_t i=0; i < Imat3.n_rows; ++i) {
           
+          //Rcout << "infected ind. i=" << i << "\n";
           //get distance between infected cells, and all other cells
           pdI_1_3(i,j)=sqrt(pow((cent3(j,0)-Imat3(i,4)),2)+pow((cent3(j,1)-Imat3(i,5)),2));
           
@@ -213,17 +216,25 @@ struct FOILoop : public Worker {
       
       //same as above for prions
       if(Pmat3.n_rows > 0){
-        for(std::size_t i=0; i < Pmat3.n_rows; ++i) {
-          pdP_1_3(i,j)=sqrt(pow((cent3(j,0)-Pmat3(i,0)),2)+pow((cent3(j,1)-Pmat3(i,1)),2)); //the prions matrix should be a subset of the landscape.prions dataframe
-          B_P_3(j,i)=(exp(F2P_int+F2P_B*pdP_1_3(i,j)))*B2;
-          if(pdP_1_3(i,j)==0){
-            W_P_3(j,i)=F1P;} else{
-              W_P_3(j,i)=0;
+        
+        //Rcout << "prions j=" << j << "\n";
+        
+        for(std::size_t k=0; k < Pmat3.n_rows; ++k) {
+          
+          //Rcout << "prions i=" << i << "\n";
+          
+          pdP_1_3(k,j)=sqrt(pow((cent3(j,0)-Pmat3(k,0)),2)+pow((cent3(j,1)-Pmat3(k,1)),2)); //the prions matrix should be a subset of the landscape.prions dataframe
+          
+          B_P_3(j,k)=(exp(F2P_int+F2P_B*pdP_1_3(k,j)))*B2;
+          
+          if(pdP_1_3(k,j)==0){
+            W_P_3(j,k)=F1P;} else{
+              W_P_3(j,k)=0;
             }
         }
       
-      B_tot(j,1)=sum(B_P_3.row(j))+sum(W_P_3.row(j));
-      } //if num_C > 0 closing bracket
+        B_tot(j,1)=sum(B_P_3.row(j))+sum(W_P_3.row(j));
+      } //if num_P > 0 closing bracket
       
       //B_tot would be the export
       
@@ -312,6 +323,8 @@ arma::mat FOIParallelFullCWD(
   //define Pse output
   arma::mat Pse(cells,1,fill::zeros);
   
+  //Rcout << Pse;
+  
   //find rows with infected pigs
   arma::ivec setmaskI(pop.n_rows);
   for(std::size_t s=0; s < pop.n_rows; ++s) {
@@ -362,7 +375,7 @@ arma::mat FOIParallelFullCWD(
   
   //combine C/I to get total transmission probabilities
   if(num_P>0&num_I>0){
-    Bsum=sum(B_tota,1);
+    Bsum=sum(B_tota,1); //this returns the rowsums of the matrix (why the second element is 1)
   }
   else { if(num_I>0){
     Bsum=B_tota.col(0);

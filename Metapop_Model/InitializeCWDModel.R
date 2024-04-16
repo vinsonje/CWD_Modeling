@@ -123,14 +123,14 @@ ss.radius = 5.0
 #####################
 ####RunModel
 #####################
-sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters related to population and epi model
-                           F1, F2_int, F2_B, B1, B2,
-                           thyme, cells,
-                           N0, K, #population parameters
-                           shift, centroids, inc, fs,
-                           midpoint,
-                           pop, I0,
-                           ss.locs, ss.times, ss.radius)
+# sim_output = SimulateOneRunCWD(Pbd, death, shed, #this are parameters related to population and epi model
+#                            F1, F2_int, F2_B, B1, B2,
+#                            thyme, cells,
+#                            N0, K, #population parameters
+#                            shift, centroids, inc, fs,
+#                            midpoint,
+#                            pop, I0,
+#                            ss.locs, ss.times, ss.radius)
 
 #output is a list with 
 # [1] Total infected/incidence

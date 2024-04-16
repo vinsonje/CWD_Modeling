@@ -63,7 +63,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
     if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
       
       print(i)
-      print(pop)
+      # print(pop)
       
       #####################################
       ######## Track I locations ######## 
