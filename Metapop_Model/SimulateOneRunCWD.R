@@ -19,7 +19,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
   Incidence = matrix(0, nrow = thyme) #store new cases for each time step
   
   I_locs = vector("list", thyme)
-  I_locs[1:thyme] = 0
+  I_locs[1:thyme] = NA
   
   Itrue = matrix(0, nrow = thyme, ncol = 1)
 
@@ -60,8 +60,9 @@ SimulateOneRunCWD = function(Pbd, death, shed,
   i = 2
   
   for(i in 2:thyme){
-    if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
-      
+    # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
+    if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
+        
       print(i)
       # print(pop)
       
@@ -90,11 +91,12 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       ###############################
       print("starting state changes")
       #births, natural deaths, disease state changes (exposure, infection, recovery, death), carcass decay
-      st.list = StateChangesCWD(pop, centroids, cells, 
+      st.list = StateChangesCWD(pop, centroids, cells,
                                 Pbd,
                                 B1, B2, F1, F2_int, F2_B,
-                                K, death, Pcr, Pir, 
-                                Incidence, BB, i) #You're here, need to make sure the arguments are correct here. 
+                                F1P, F2P_int, F2P_B,
+                                K, death,
+                                Incidence, BB, i, landscape.prions) 
       pop = st.list[[1]]
       Incidence = st.list[[2]]
       BB = st.list[[3]]
@@ -132,6 +134,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       ###############################
       #### Sharpshooting ############
       ###############################
+      print("starting sharpshooting")
       pop = sharpshootingCWD(pop, centroids, ss.loc, ss.time, ss.radius, thyme)
       
       #############################

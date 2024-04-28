@@ -121,8 +121,6 @@ struct FOILoop : public Worker {
     return pdI_1_2;
   }
   
-  //you need a convertPdC_1 function here. 
-  
   arma::mat convertB_I()
   {
     RMatrix<double> tmp_mat = B_I;
@@ -193,7 +191,7 @@ struct FOILoop : public Worker {
           
           //using distance to get probability of contact for cell j
           //B_I_3(j,i)=(exp(F2_int+F2_B*pdI_1_3(i,j)))*B1;
-          B_I_3(j,i)=(1/(1+exp(-1*(F2_int+F2_B*pdI_1_3(i,j)))))*B1;
+          B_I_3(j,i)=(1/(1+exp(-1*(F2_int+F2_B*pdI_1_3(i,j)))))*B1; //B1 IS HERE
           //1/(1+exp(-(F2_int+F2_B*0.4)))
           
           
@@ -225,7 +223,7 @@ struct FOILoop : public Worker {
           
           pdP_1_3(k,j)=sqrt(pow((cent3(j,0)-Pmat3(k,0)),2)+pow((cent3(j,1)-Pmat3(k,1)),2)); //the prions matrix should be a subset of the landscape.prions dataframe
           
-          B_P_3(j,k)=(exp(F2P_int+F2P_B*pdP_1_3(k,j)))*B2;
+          B_P_3(j,k)=(exp(F2P_int+F2P_B*pdP_1_3(k,j)))*B2; //B2 IS HERE
           
           if(pdP_1_3(k,j)==0){
             W_P_3(j,k)=F1P;} else{
@@ -279,6 +277,7 @@ NumericMatrix parallelFOI(
   //essentially just defining the size of the output
   NumericMatrix B_tot(cent.nrow(), 2);
   
+  Rcout << B_tot;
   
   //output is output matrix defined above
   FOILoop foiloop(Imat,Pmat,cent,pdI_1,pdP_1,B_I,W_I,B_P,W_P,B1,B2,F1,F2_int,F2_B,F1P,F2P_int,F2P_B,B_tot);
@@ -377,18 +376,20 @@ arma::mat FOIParallelFullCWD(
   arma::mat B_tota=as<arma::mat>(B_tot);
   
   //combine C/I to get total transmission probabilities
-  if(num_P>0&num_I>0){
+  if(((num_P)>0)&((num_I>0))){
     Bsum=sum(B_tota,1); //this returns the rowsums of the matrix (why the second element is 1)
-  }
-  else { if(num_I>0){
+  } //closing if P AND I > 0
+  else { 
+    if(num_I>0){
     Bsum=B_tota.col(0);
     
-  }
-  else { if(num_P>0){
+    }//closing if I>0
+  else { 
+    if(num_P>0){
     Bsum=B_tota.col(1); 
-  }
-  }
-  }
+    }//Closing if P>0
+  }//closing else on I>0
+  }//closing else on P and I > 0
   
   Pse = 1-exp(-Bsum.col(0));
   

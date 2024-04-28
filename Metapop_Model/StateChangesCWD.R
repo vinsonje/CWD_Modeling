@@ -2,8 +2,10 @@
 StateChangesCWD = function(pop, centroids, cells,
                       Pbd,
                       B1, B2, F1, F2_int, F2_B,
-                      K, death, Pcr, Pir,
-                      Incidence, BB, i){
+                      F1P, F2P_int, F2P_B,
+                      K, death,
+                      Incidence, BB, i, 
+                      landscape.prions){
   ####################################################################
   ########### Initialize state change probability matrices ########### 
   ####################################################################
@@ -86,8 +88,10 @@ StateChangesCWD = function(pop, centroids, cells,
   ##############################################################
   
   # Pse = FOICWD(pop, centroids, cells ,B1, F1, F2) #force of infection #R version
-  Pse = FOIParallelFullCWD(pop, centroids, cells, B1, B2, F1, F2_int, F2_B) #C++ version
-  #Pse is the probability of becoming infected for each individual in each family
+  
+  Pse = FOIParallelFullCWD(pop, as.matrix(landscape.prions), centroids, cells, B1, B2, F1, F2_int, F2_B, F1P, F2P_int, F2P_B) #C++ version
+  #Pse is the probability of becoming infected for each S individual in each family; 
+  #it is the probability of each cell on the landscape
 
   Pei = 1 - exp(-1/rpois(nrow(pop), 4)/7) #transitions exposure to infected
   Pid = 1 - exp(-1/rpois(nrow(pop), 5)/7) #transitions infected to either dead 

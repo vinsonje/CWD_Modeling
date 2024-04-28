@@ -11,7 +11,7 @@ library(magick)
 plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=10, gif.fps=20, save=FALSE){
   
   #Prion Heatmap
-  p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[9]]), aes(x = cent.x, y = cent.y, fill = prions)) + 
+  p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[9]]), aes(x = X1, y = X2, fill = prions)) + 
     theme_cowplot() + scale_fill_gradient(low = "white", high = "red") + xlim(0, grid.xmax) + ylim(0, grid.ymax)
   
   #Plot where infectious are through time
@@ -33,8 +33,8 @@ plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=10, gi
   y.loc.temp = NULL
   for(i in 1:dim(I.loc.df2)[1]){
     I.loc.grid.id = as.numeric(as.character(I.loc.df2$grid.id[i]))
-    x.loc.temp = c(x.loc.temp, centroids$cent.x[I.loc.grid.id])
-    y.loc.temp = c(y.loc.temp, centroids$cent.y[I.loc.grid.id])
+    x.loc.temp = c(x.loc.temp, centroids[I.loc.grid.id,1])
+    y.loc.temp = c(y.loc.temp, centroids[I.loc.grid.id,2])
   }
   I.loc.df.final = data.frame(I.loc.df2, x.loc = x.loc.temp, y.loc = y.loc.temp)
   I.loc.df.final = I.loc.df.final[order(I.loc.df.final$time),]

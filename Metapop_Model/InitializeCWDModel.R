@@ -105,6 +105,13 @@ F2 = glm(yy ~ xx, family = "binomial")
 F2_int = F2$coef[[1]]
 F2_B = F2$coef[[2]]
 
+##########################
+#Prion transmission parameters
+########################
+F1P = F1
+F2P_int = F2_int
+F2P_B = F2_B
+
 ######################
 ####Initialize Population
 #####################
@@ -131,7 +138,7 @@ ss.radius = 5.0
 #                            midpoint,
 #                            pop, I0,
 #                            ss.locs, ss.times, ss.radius)
-
+# 
 #output is a list with 
 # [1] Total infected/incidence
 # [2] Time of last infected
@@ -142,4 +149,5 @@ ss.radius = 5.0
 # [7] Locations of positive IDs
 # [8] Total number of infected at each time point
 
+# plot.landscape.meta(sim_output, grid.xmax, grid.ymax)
 
