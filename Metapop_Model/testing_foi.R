@@ -40,8 +40,8 @@ source(paste(getwd(), "/CWDSourcer.R", sep = ''))
 thyme = 70
 
 #grid/landscape parameters
-grid.xmax = 10
-grid.ymax = 10
+grid.xmax = 80
+grid.ymax = 80
 cell.x.size = 0.5
 cell.y.size = 0.5
 density = 10 #density per X
@@ -166,4 +166,4 @@ Incidence[1] = num_inf_0
 
 pop.out = cbind(pop, rep(1,dim(pop)[1]))
 
-Pse = FOIParallelFullCWD(pop, as.matrix(landscape.prions), centroids, cells, B1, B2, F1, F2_int, F2_B, F1P, F2P_int, F2P_B) #C++ version
+# Pse = FOIParallelFullCWD(pop, as.matrix(landscape.prions), centroids, cells, B1, B2, F1, F2_int, F2_B, F1P, F2P_int, F2P_B) #C++ version
