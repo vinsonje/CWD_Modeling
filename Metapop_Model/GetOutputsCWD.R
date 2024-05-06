@@ -55,9 +55,12 @@ return(list.all)
 #output is a list with 
 # [1] Total infected/incidence
 # [2] Time of last infected
-# [3] #Maximum distance that it spread
+# [3] Maximum distance that it spread
 # [4] Number of infected at end
 # [5] Total number of detections
 # [6] Locations of Infected across time series
 # [7] Locations of positive IDs
 # [8] Total number of infected at each time point
+# [9] Dataframe of the prions on the landscape at each timepoint
+# [10] Dataframe of time and total population size at each time point
+# [11] Long dataframe of pop. at each time point

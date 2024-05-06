@@ -94,16 +94,22 @@ B2 = 0.5*0.2
 
 n_sim = 10000           # for the initial dataset
 
-xx = runif(n_sim)     # predictor values
-coefficients = c(0.98, 1.9128) # my assumption
+xx = runif(n_sim) * sqrt(grid.xmax^2 + grid.ymax^2)     # predictor values
+coefficients = c(1, -0.05) # my assumption
 prob = 1/(1 + exp(-(coefficients[1] + coefficients[2] * xx)))
 
-yy = runif(n_sim) < prob
+yy = (runif(n_sim) < prob)*1
+
+plot(xx, yy)
 
 F2 = glm(yy ~ xx, family = "binomial")
 
 F2_int = F2$coef[[1]]
 F2_B = F2$coef[[2]]
+
+test.data = data.frame(xx = seq(0, sqrt(grid.xmax^2 + grid.ymax^2), 0.01))
+test.pred = predict(F2, newdata = test.data, type = "response")
+lines(test.data$xx, test.pred, col = "red")
 
 ##########################
 #Prion transmission parameters

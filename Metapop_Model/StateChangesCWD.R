@@ -1,8 +1,8 @@
 #outputs: pop,Incidence,BB
 StateChangesCWD = function(pop, centroids, cells,
                       Pbd,
-                      B1, B2, F1, F2_int, F2_B,
-                      F1P, F2P_int, F2P_B,
+                      B1, F1, F2,
+                      B1P.m, B1P.inter,
                       K, death,
                       Incidence, BB, i, 
                       landscape.prions){
@@ -87,11 +87,12 @@ StateChangesCWD = function(pop, centroids, cells,
   ######## Determine disease state change probabilities ######## 
   ##############################################################
   
-  # Pse = FOICWD(pop, centroids, cells ,B1, F1, F2) #force of infection #R version
-  
-  Pse = FOIParallelFullCWD(pop, as.matrix(landscape.prions), centroids, cells, B1, B2, F1, F2_int, F2_B, F1P, F2P_int, F2P_B) #C++ version
+  Pse = FOICWD(pop, centroids, cells,
+               B1, F1, F2,
+               B1P.m, B1P.inter,
+               landscape.prions) #force of infection #R version
   #Pse is the probability of becoming infected for each S individual in each family; 
-  #it is the probability of each cell on the landscape
+  #it is organized as a vector with the the probability of each cell on the landscape
 
   Pei = 1 - exp(-1/rpois(nrow(pop), 4)/7) #transitions exposure to infected
   Pid = 1 - exp(-1/rpois(nrow(pop), 5)/7) #transitions infected to either dead 
@@ -134,13 +135,13 @@ StateChangesCWD = function(pop, centroids, cells,
   ###################################
   ######## Update pop matrix ######## 
   ###################################
-  
-  #update states in pop matrix
+    #update states in pop matrix
   ###################################
   pop[, 8] = pop[, 8] - Eep + Sdpb - Sdpd #Snew = Sold - S->E + births - deaths
   pop[, 9] = pop[, 9] - Iep + Eep - Edpd #Enew = Eold - E->I + S->E - deaths
   pop[, 10] = pop[, 10] - Zdpd + Iep - Idpd #Inew = Iold - death via inf. + E->I - deaths
   pop[, 11] = pop[, 11] + Sdpd + Zdpd + Edpd - Idpd #Znew = Zold + (S + E + I) deaths
+  #this last one I think I should just have as the new dead from infection to do the corpse prion burst. 
   
   #sometimes end up with negative numbers 
   #(i.e. all individuals in families chosen for natural mort and disease mort)

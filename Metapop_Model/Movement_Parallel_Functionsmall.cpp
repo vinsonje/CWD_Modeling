@@ -198,7 +198,7 @@ struct MoveLoop : public Worker {
           
           //if there are more than 1 cell with same minimum abundance, choose one at random
           if(cellindarma.size()>1){
-            truemin = Rcpp::RcppArmadillo::sample(cellindarma,1,false);
+            truemin = Rcpp::RcppArmadillo::sample(cellindarma, 1, false);
             
           } else {
             truemin = cellindarma;

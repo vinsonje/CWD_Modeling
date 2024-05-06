@@ -1,11 +1,12 @@
 ##The purpose of this script is to run a single rep of the CWD model
 
 SimulateOneRunCWD = function(Pbd, death, shed,
-                         F1, F2_int, F2i_B, B1, B2,
+                         F1, F2, B1,
+                         B1P.m, B1P.inter,
                          thyme, cells, N0, K,
                          shift, centroids, inc, fs,
                          midpoint, pop, I0, 
-                         ss.loc, ss.time, ss.radius){
+                         ss.loc, ss.time, ss.radius, ss.eff){
 
   ###########################################
   ######## Initialize Output Objects ######## 
@@ -93,10 +94,11 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       #births, natural deaths, disease state changes (exposure, infection, recovery, death), carcass decay
       st.list = StateChangesCWD(pop, centroids, cells,
                                 Pbd,
-                                B1, B2, F1, F2_int, F2_B,
-                                F1P, F2P_int, F2P_B,
+                                B1, F1, F2,
+                                B1P.m, B1P.inter,
                                 K, death,
-                                Incidence, BB, i, landscape.prions) 
+                                Incidence, BB, i, 
+                                landscape.prions) 
       pop = st.list[[1]]
       Incidence = st.list[[2]]
       BB = st.list[[3]]
@@ -135,7 +137,7 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       #### Sharpshooting ############
       ###############################
       print("starting sharpshooting")
-      pop = sharpshootingCWD(pop, centroids, ss.loc, ss.time, ss.radius, thyme)
+      pop = sharpshootingCWD(pop, centroids, ss.loc, ss.time, ss.radius, ss.eff, thyme)
       
       #############################
       ####Track true spatial spread

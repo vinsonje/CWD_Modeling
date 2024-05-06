@@ -8,7 +8,7 @@ library(gridExtra)
 library(tidyr)
 library(magick)
 
-plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=10, gif.fps=20, save=FALSE){
+plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=30, gif.fps=20, save=FALSE){
   
   #Prion Heatmap
   p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[9]]), aes(x = X1, y = X2, fill = prions)) + 
