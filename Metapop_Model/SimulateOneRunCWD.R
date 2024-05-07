@@ -1,6 +1,6 @@
 ##The purpose of this script is to run a single rep of the CWD model
 
-SimulateOneRunCWD = function(Pbd, death, shed,
+SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
                          F1, F2, B1,
                          B1P.m, B1P.inter,
                          thyme, cells, N0, K,
@@ -123,7 +123,14 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       }#end of if statement to test if there are any Is
       
       ################################
-      ####### Removal of prions#######
+      ####### Corpse Burst ###########
+      ################################
+      print("starting corpse burst")
+      #corpse burst function
+      
+      
+      ################################
+      ####### Removal of prions #######
       ################################
       print("starting prions removal")
       for(l in 1:dim(landscape.prions)[1]){
@@ -132,6 +139,12 @@ SimulateOneRunCWD = function(Pbd, death, shed,
       
       landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
       landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
+      
+      ##############################
+      ######### Harvesting #########
+      ##############################
+      print("starting harvesting")
+      #harvesting function
       
       ###############################
       #### Sharpshooting ############

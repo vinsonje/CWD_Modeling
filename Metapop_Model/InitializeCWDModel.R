@@ -109,6 +109,8 @@ F2_B = F2$coef[[2]]
 B1P.m = -1
 B1P.inter = 200
 
+corpse.burst = 300
+
 ######################
 ####Initialize Population
 #####################
@@ -128,13 +130,13 @@ ss.eff = 0.5
 #####################
 ####RunModel
 #####################
-sim_output = SimulateOneRunCWD(Pbd, death, shed,
-                               F1, F2, B1,
-                               B1P.m, B1P.inter,
-                               thyme, cells, N0, K,
-                               shift, centroids, inc, fs,
-                               midpoint, pop, I0, 
-                               ss.locs, ss.times, ss.radius, ss.eff)
+# sim_output = SimulateOneRunCWD(Pbd, death, shed, corpse.burst,
+#                                F1, F2, B1,
+#                                B1P.m, B1P.inter,
+#                                thyme, cells, N0, K,
+#                                shift, centroids, inc, fs,
+#                                midpoint, pop, I0, 
+#                                ss.locs, ss.times, ss.radius, ss.eff)
 
 #output is a list with 
 # [1] Total infected/incidence
@@ -149,5 +151,5 @@ sim_output = SimulateOneRunCWD(Pbd, death, shed,
 # [10] Dataframe of time and total population size at each time point
 # [11] Long dataframe of pop. at each time point
 
-plot.landscape.meta(sim_output, grid.xmax, grid.ymax)
+# plot.landscape.meta(sim_output, grid.xmax, grid.ymax)
 
