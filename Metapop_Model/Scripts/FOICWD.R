@@ -45,6 +45,7 @@ FOICWD = function(pop, centroids, cells,
       
       #to replace all the 0's in the array, we need to loop through each infected cell (array[i,,])
       for(i in 1:nrow(Imat)){
+        # print(paste("calculating I distances ", i, " in ", nrow(Imat)))
         #calculate the distance of the infected cell with all the other cells on the landscape
         pdI[i, , 1] = sqrt((centroids[, 1] - Imat[i, 5])^2 + (centroids[, 2] - Imat[i, 6])^2) 
         #calculate the probability of the infected deer coming into contact with all the other cells on the landscape
@@ -104,10 +105,11 @@ FOICWD = function(pop, centroids, cells,
       #the probability that the deers from the respective cells have a prion contact, i.e. move into that cell ("prob")
       #right now this will come from the same glm for direct contacts
       #I think it will need to be something with a homerange overlap analysis
-      pdP = array(0, dim = c(num_P_cells,cells,2), dimnames = list(paste0("P_", 1:num_I), paste0("cell_", 1:cells), c("dist","prob")))
+      pdP = array(0, dim = c(num_P_cells,cells,2), dimnames = list(paste0("P_", 1:num_P_cells), paste0("cell_", 1:cells), c("dist","prob")))
       
       #to replace all the 0's in the array, we need to loop through each prion cell (array[i,,])
       for(i in 1:nrow(Pmat)){
+        # print(paste("calculating P distances ", i, " in ", nrow(Pmat)))
         #calculate the distance of the prion cell with all the other celss on the landscape
         pdP[i, , 1] = sqrt((centroids[, 1] - Pmat[i, 1])^2 + (centroids[, 2] - Pmat[i, 2])^2) #this is distance calculation; you had to add an i here not sure if that is needed
         #calculate the probability of the prion coming into contact with deer from all the other cells on the landscape
@@ -128,8 +130,8 @@ FOICWD = function(pop, centroids, cells,
       for(i in 1:dim(pdP)[1]){
         #calculate the FOI that infected cell i has on each cell on the landscape
         #need to determine the prob. of successful transmission as a function of the number of prions
-        B1P.real = 1/(1+exp(B1.m*Pmat[i,3] + B1P.inter))
-        B_P[,i] = (pdP[i,,2] * B1P) #NEED TO PUT THE LOGISTIC FUNCTION HERE FOR PROB OF PRION TRANSMISSION SUCCESS
+        B1P.real = 1/(1+exp(B1P.m*Pmat[i,3] + B1P.inter))
+        B_P[,i] = (pdP[i,,2] * B1P.real) #NEED TO PUT THE LOGISTIC FUNCTION HERE FOR PROB OF PRION TRANSMISSION SUCCESS
       }
       
       #to calculate each cell on the landscape has coming from all infected cells
@@ -141,7 +143,7 @@ FOICWD = function(pop, centroids, cells,
         #if any of the distances are 0, meaning within the same cell
         P_direct = which(pdP[i, , 1:2][, 1] == 0)
         #set that FOI for within the same cell to F1P
-        B_P[P_direct] = 1/(1+exp(B1.m*Pmat[i,3] + B1P.inter)) #This needs to be a function of the number of prions in the cell
+        B_P[P_direct] = 1/(1+exp(B1P.m*Pmat[i,3] + B1P.inter)) #This needs to be a function of the number of prions in the cell
         
       }
     }

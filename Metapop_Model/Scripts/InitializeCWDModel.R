@@ -12,7 +12,7 @@ rm(list = ls())
 ####Set directories
 #####################
 # setwd("~/Desktop/IBM_files/Metapop Model") #for my Mac
-setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model") #for my PC
+setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model/Scripts") #for my PC
 
 ######################
 ####Set libraries
@@ -37,14 +37,14 @@ source(paste(getwd(), "/CWDSourcer.R", sep = ''))
 ######################
 ####Define Parameters
 ###################
-thyme = 20
+thyme = 70
 
 #grid/landscape parameters
 grid.xmax = 20
 grid.ymax = 20
-cell.x.size = 0.5
-cell.y.size = 0.5
-density = 10 #density per X
+cell.x.size = 1.0
+cell.y.size = 1.0
+density = 5 #density per X
 area = grid.xmax * grid.ymax #total area of the grid
 
 #host demographic parameters
@@ -57,8 +57,8 @@ mc_time = 0.0027 #this is just a rounding of 1/365
 Pbd = 7*mc_time #; %repmat(mean(c_time(1:364/7)),time,1).*1; % constant birth rate for S; rescale trend as needed to produce realistic pop dynamics
 
 #host relocation parameters
-shift = c(2.0, 0.3550) #shape and scale of the gamma distribution that defines how far they relocate on the landscape
-inc = 0.5 #home range size of the population (basically, if they are drawn to relocate lower than this number they don't relocate)
+shift = c(0.4, 0.3550) #shape and scale of the gamma distribution that defines how far they relocate on the landscape
+inc = 1.0 #home range size of the population (basically, if they are drawn to relocate lower than this number they don't relocate)
 
 #disease parameters
 shed = 20 #the shedding rate of infected deer (mean of poisson distribution)
@@ -135,9 +135,9 @@ ss.eff = 0.5
 #                                B1P.m, B1P.inter,
 #                                thyme, cells, N0, K,
 #                                shift, centroids, inc, fs,
-#                                midpoint, pop, I0, 
+#                                midpoint, pop, I0,
 #                                ss.locs, ss.times, ss.radius, ss.eff)
-
+# 
 #output is a list with 
 # [1] Total infected/incidence
 # [2] Time of last infected

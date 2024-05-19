@@ -55,11 +55,11 @@ sharpshootingCWD = function(pop, centroids, ss.loc, ss.time, ss.radius, ss.eff, 
         E.rem = length(which(rem.mems == "E"))
         I.rem = length(which(rem.mems == "I"))
         
-        pop[fams.rem.index[f], 8] = pop[fams.rem.index[f], 8] - S.rem
-        pop[fams.rem.index[f], 9] = pop[fams.rem.index[f], 9] - E.rem
-        pop[fams.rem.index[f], 10] = pop[fams.rem.index[f], 10] - I.rem
+        pop.out[fams.rem.index[f], 8] = pop.out[fams.rem.index[f], 8] - S.rem
+        pop.out[fams.rem.index[f], 9] = pop.out[fams.rem.index[f], 9] - E.rem
+        pop.out[fams.rem.index[f], 10] = pop.out[fams.rem.index[f], 10] - I.rem
         
-        pop[fams.rem.index[f], 1] = sum(pop[fams.rem.index[f],8:10])
+        pop.out[fams.rem.index[f], 1] = sum(pop.out[fams.rem.index[f],8:10])
       } #end for loop
     } #end else
     # print(dim(pop.out)[1])

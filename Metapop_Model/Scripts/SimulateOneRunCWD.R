@@ -61,8 +61,8 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
   i = 2
   
   for(i in 2:thyme){
-    # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
-    if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
+    if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
+    # if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
         
       print(i)
       # print(pop)
@@ -95,7 +95,7 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
       st.list = StateChangesCWD(pop, centroids, cells,
                                 Pbd,
                                 B1, F1, F2,
-                                B1P.m, B1P.inter,
+                                B1P.m, B1P.inter, 
                                 K, death,
                                 Incidence, BB, i, 
                                 landscape.prions) 
@@ -113,9 +113,9 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
         
       for(k in 1:dim(Imat)[1]){
         
-        prions.shed = rpois(Imat[k,9], shed)
-        
-        land.index = intersect(which(landscape.prions$cent.x == Imat[k,5]), which(landscape.prions$cent.y == Imat[k,6]))
+        prions.shed = rpois(Imat[k,10], shed)
+        # print(paste(prions.shed, "prions"))
+        land.index = intersect(which(landscape.prions[,1] == Imat[k,5]), which(landscape.prions[,2] == Imat[k,6]))
         
         landscape.prions[land.index,]$prions = landscape.prions[land.index, ]$prions + sum(prions.shed)
       }
@@ -145,6 +145,13 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
       ##############################
       print("starting harvesting")
       #harvesting function
+      
+      ##############################
+      ######### Surveillance #######
+      ##############################
+      print("starting surveillance")
+      #surveillance function
+      
       
       ###############################
       #### Sharpshooting ############
