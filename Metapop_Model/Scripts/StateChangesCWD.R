@@ -3,7 +3,7 @@ StateChangesCWD = function(pop, centroids, cells,
                       Pbd,
                       B1, F1, F2,
                       B1P.m, B1P.inter,
-                      K, death,
+                      K, death, lat.period, inf.period,
                       Incidence, BB, i, 
                       landscape.prions){
   ####################################################################
@@ -33,20 +33,25 @@ StateChangesCWD = function(pop, centroids, cells,
   Zdpd[, 1] = 0
   
   ########################################
+  ######## Determine Death Prob ########## 
+  ########################################  
+  Pdeath = 1 - exp(-death)
+  
+  ########################################
   ########### Determine Births ########### 
   ########################################
   
   #subset family sets with live individuals
-  idN = pop[pop[, 8, drop = FALSE] > 0 | pop[, 9, drop = FALSE] > 0 | pop[, 10, drop=FALSE] > 0 | pop[, 11, drop=FALSE] > 0, ]
+  # idN = pop[pop[, 8, drop = FALSE] > 0 | pop[, 9, drop = FALSE] > 0 | pop[, 10, drop=FALSE] > 0 | pop[, 11, drop=FALSE] > 0, ]
   
   #Number of live individuals
-  liveind = sum(colSums(pop)[8:11])
+  liveind = sum(colSums(pop)[8:10])
   
   #get row indices of live individuals
-  liverows = which(pop[, 8,drop = FALSE] > 0 | pop[, 9, drop = FALSE] > 0 | pop[, 10, drop = FALSE] > 0 | pop[, 11, drop = FALSE] > 0) #rownums with live indiv
+  liverows = which(pop[, 8,drop = FALSE] > 0 | pop[, 9, drop = FALSE] > 0 | pop[, 10, drop = FALSE] > 0) #rownums with live indiv
   
   #density-dependent birth rate
-  Brate = Pbd*liveind*(1-liveind/K)
+  Brate = max(Pbd*liveind*(1-liveind/K),  0)
   
   #get total births, using Brate as mean in a poisson
   Tbirths = rpois(1, Brate)
@@ -67,10 +72,10 @@ StateChangesCWD = function(pop, centroids, cells,
   if(length(id) > 1){
     
     #if there are more live families than births needed	
-    if(length(id) <= nrow(idN)){
+    if(length(id) <= nrow(pop)){
       
-      #%pick which cells with individuals will get the births
-      id2 = sample(1:nrow(idN), length(id))
+      #pick which cells with individuals will get the births
+      id2 = sample(1:nrow(pop), length(id))
       
     } else {
       #%if there are more births than cells only add births cells where the individuals are (so fewer births will be happening)
@@ -94,8 +99,8 @@ StateChangesCWD = function(pop, centroids, cells,
   #Pse is the probability of becoming infected for each S individual in each family; 
   #it is organized as a vector with the the probability of each cell on the landscape
 
-  Pei = 1 - exp(-1/rpois(nrow(pop), 4)/7) #transitions exposure to infected
-  Pid = 1 - exp(-1/rpois(nrow(pop), 5)/7) #transitions infected to either dead 
+  Pei = 1 - exp(-lat.period) #transitions exposure to infected
+  Pid = 1 - exp(-inf.period) #transitions infected to either dead 
   
   
   ###############################################
@@ -107,7 +112,7 @@ StateChangesCWD = function(pop, centroids, cells,
     #operations on Susceptible individuals
     if(pop[k, 8]>0){
 
-      Sdpd[k] = sum(rbinom(pop[k, 8], 1, death)) #determine how many S die
+      Sdpd[k] = sum(rbinom(pop[k, 8], 1, Pdeath)) #determine how many S die
       Eep[k] = sum(rbinom(pop[k, 8], 1, Pse[pop[k, 3]])) #Exposure (S -> E) infection based on probability using their location
       
     }	
@@ -115,14 +120,14 @@ StateChangesCWD = function(pop, centroids, cells,
     #operations on Exposed individuals
     if(pop[k,9]>0){ 
       
-      Edpd[k] = sum(rbinom(pop[k,9], 1, death)) #determine how many E die
+      Edpd[k] = sum(rbinom(pop[k,9], 1, Pdeath)) #determine how many E die
       Iep[k] = sum(rbinom(pop[k,9], 1, Pei)) #determine how many transition to I
       
     }
     
     #operations on Infected individuals	
     if(pop[k, 10] > 0){
-      Idpd[k] = sum(rbinom(pop[k, 10], 1, death)) #determine how many I die to natural causes
+      Idpd[k] = sum(rbinom(pop[k, 10], 1, Pdeath)) #determine how many I die to natural causes
       Zdpd[k] = sum(rbinom(pop[k, 10], 1, Pid)) #determine how many die from infection
      }	
     

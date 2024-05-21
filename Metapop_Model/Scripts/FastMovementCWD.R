@@ -9,7 +9,9 @@ pop[pop[,4] < inc,][,4]=0
 #set present locations to previous locations
 pop[,7] = pop[,3]
 
-m1 = parallelMovementRcpp_portion(pop,pop[,1,drop=FALSE],pop[,3,drop=FALSE],centroids) #this determines the cell id of where the family moved to. 
+# m1 = parallelMovementRcpp_portion(pop,pop[,1,drop=FALSE],pop[,3,drop=FALSE],centroids,20) #this determines the cell id of where the family moved to. 
+
+m1 = movement_fun(pop,centroids, 10, move.strat = "maxden") #this determines the cell id of where the family moved to. 
 
 pop[,3] = m1 #assign new cell id 
 

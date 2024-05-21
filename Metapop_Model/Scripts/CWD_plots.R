@@ -8,7 +8,7 @@ library(gridExtra)
 library(tidyr)
 library(magick)
 
-plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=30, gif.fps=20, save=FALSE){
+plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=21, gif.fps=20, save=FALSE){
   
   #Prion Heatmap
   p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[9]]), aes(x = X1, y = X2, fill = prions)) + 
@@ -27,7 +27,8 @@ plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=30, gi
   I.loc.table = table(I.loc.df)
   I.loc.df2 = as.data.frame(I.loc.table)
   names(I.loc.df2) = c("time", "grid.id", "num")
-  I.loc.df2 = I.loc.df2[-which(I.loc.df2$num==0),]
+  
+  # I.loc.df2 = I.loc.df2[-which(I.loc.df2$num==0),]
   
   x.loc.temp = NULL
   y.loc.temp = NULL
@@ -41,7 +42,9 @@ plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=30, gi
   I.loc.df.final$time = as.numeric(I.loc.df.final$time)
   
   p.inf = ggplot() + geom_tile(data = I.loc.df.final, aes(x = x.loc, y = y.loc, fill = num)) +
-    theme_cowplot() + scale_fill_gradient(low = "white", high = "blue") + xlim(0, grid.xmax) + ylim(0, grid.ymax)
+    geom_point(data = sim_output[[11]], aes(x = x.now, y = y.now, color = as.factor(fam.id))) +
+    theme_cowplot() + scale_fill_gradient(low = "white", high = "blue") + xlim(0, grid.xmax) + ylim(0, grid.ymax) + 
+    scale_color_manual(values = rep("black", 200), guide = "none")
 
   #Infection Abundance
   I.time = data.frame(time = 1:length(sim_output[8]$Isums), I = sim_output[8]$Isums)

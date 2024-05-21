@@ -1,0 +1,137 @@
+---
+title: "Modeling Chronic Wasting Disease - Metapopulation Model"
+author: "John Vinson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r "load packages", echo = FALSE, warning = FALSE}
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(cowplot)
+```
+
+```{r "set wd and seed", echo = FALSE, warning = FALSE}
+set.seed(101)
+setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up")
+```
+
+## Model Overview
+
+We developed a metapopulation model that describes the transmission of chronic wasting disease (CWD) on a landscape. The model tracks families (groups) of individuals including the number of susceptible (S), exposed (E), and infectious individuals in each family. We assume that families can relocate on the landscape but individuals can move (implicitly, i.e. we do not directly track their movements) to have both direct and indirect contacts (prions) with individuals in other locations on the landscape. Susceptible individuals can become infected via direct contacts with infectious individuals after which they transition to exposed. Exposed individuals become infectious, whereby they begin shedding prions into the environment (their current location/cell). Infectious individuals that die, not via hunting or sharpshooting), can quickly release a large number of prions through their corpse. These prions persist in the environment and susceptible individuals that come into contact them can become infected (transition to exposed). 
+
+Births result in new susceptible individuals, and all individuals can die through natural mortality. All individuals can be harvested (die) via hunting. Harvested individuals can be sent to testing to determine infection status. The positive identifications are used to determine where sharp shooting (culling events) occur on the landscape. 
+
+```{r compartment image, echo = FALSE, fig.align = "center", fig.cap = "Fig 1. Simple diagram of CWD transmission in model"}
+include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/CWD Compartment Diagram.jpg")
+```
+
+## Process
+
+We can break down our simulation algorithm into distinct processes involving initialization of the simulation, simulating a single run, and generating outputs.
+
+### Initialize
+
+#### Create the landscape (grid)
+
+A **grid.xmax** x **grid.ymax** units^2^ (**area**) grid that represents the landscape is generated. The landscape is separated into cells each of **cell.x.size** by **cell.y.size** units^2^. 
+
+This creates a matrix with the cell/grid id, the x and y coordinates of the bottom left corner, the coordinates of the top right corner, and the midpoints (centroids) of each cell. 
+
+#### Initialize the familes (population) on the landscape
+
+Given the total number of individuals (**N0**, $density * area$), families are placed onto the landscape. Initially families do not overlap (occupy the same cell). 
+
+Roughly $\frac{N0}{fs}$ families are placed onto the landscape with locations determined from a binomial distribution (probability of success set as the probability of occupancy; number of families/number of cells), with an average family size of **fs** individuals. Family sizes are drawn from a Poisson distribution with mean **fs**. All the individuals are assumed to be susceptible. 
+
+#### Initialize infection
+
+To start infection on the landscape, a single infectious individual is placed in the center of the landscape.
+
+This is done by creating a family with a single individual that is infectious at the midpoint of the landscape.
+
+
+```{r landscape example, echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.cap = "Fig. 2. Example landscape and family occupancy. 100 x 100 km^2 with a cell size of 1 x 1 km^2. Density is 5 individuals/km with an average family size of 12 individuals. Colored points present familes with the intensity representing the number of individuals. The pink triangle is the single infectious individual."}
+
+setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model/Scripts")
+source(paste(getwd(), "/CWDSourcer.R", sep = ''))
+
+#grid/landscape parameters
+grid.xmax = 100
+grid.ymax = 100
+cell.x.size = 1.0
+cell.y.size = 1.0
+density = 5 #density per X
+area = grid.xmax * grid.ymax #total area of the grid
+
+#host demographic parameters
+N0 = density*area #initial population size
+K = floor(N0*1.5) #carrying capacity for whole population
+fs = 12 #average family size
+
+grid = create.grid(grid.xmax, grid.ymax, cell.x.size, cell.y.size)
+
+centroids = grid[,6:7]
+cells = nrow(grid)
+
+pop = InitializeFamilies(N0, fs, cells, centroids, 0, 0, 0)
+
+midpoint = c(max(centroids[,1]/2),max(centroids[,2]/2))
+id = which(centroids[, 1] >= midpoint[1] & centroids[, 2] >= midpoint[2])[1] 
+
+
+ggplot() + geom_point(aes(x = pop[,5], y = pop[,6], color = pop[,1])) + 
+  # geom_text(aes(x = grid[,6], y = grid[,7], label=grid[,1]), alpha=0.75, color="#997009", size = 3.0) +
+  geom_point(aes(x = centroids[id,1], y = centroids[id,2]), shape = 17, size = 3, color = "#FF69B4") +
+  theme_cowplot() + ylab("Y (km)") + xlab("X (km)") + 
+  scale_color_gradient(name = "family size", low = "#009b00", high = "#002000")
+```
+
+### Run simulation
+
+Once everything is initialized, the simulation will repeat until the **thyme**, the maximum number of time steps, is reached. 
+
+#### Relocate families (movement)
+
+Families can relocate to a new cell. For each family on the landscape, the distance that they "relocate" is sampled from a gamma distribution (shape and scale from **shift**). If the distance they relocate is less than their homerange size, **inc**, then the family does not move. If it is greater and they do relocate, they are able to move to cell that withing the range of the sampled distance (excluding the cell they care currently in). There are three strategies, **move.strat**, that they could follow: "random" (individuals move to a random cell withing their range), "avoid" (families move to cells that are least occupied/have the lowest density), and "**max.den**" (there is a maximum threshold density and families cannot move to cells that meet or have exceeded that density).
+
+#### State changes
+
+This is a large process that encapsulates many different demographic and epidemiological processes. 
+
+##### Births
+
+##### Natural deaths
+
+##### Transitions
+
+##### Infection events
+
+###### Direct Transmission
+
+###### Environmental (prion) transmission
+
+#### Shedding
+
+#### Corpse burst
+
+#### Removal of prions
+
+
+#### Harvesting
+
+
+#### Surveillance
+
+
+#### Sharpshooting
+
+## Parameters
+
+```{r "parms table", echo = FALSE}
+source(paste0(getwd(), "/parms_table.R"))
+parm.df = data.frame(parmeter = all.parm.names, meaning = all.parm.mean)
+
+kable(parm.df, "html") %>%   kable_styling(full_width = F) %>%
+  column_spec(1, width = '1in') %>% column_spec(2, width = '4in')
+```

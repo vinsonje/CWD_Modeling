@@ -33,7 +33,7 @@ DET = sum(unlist(POSlive_locs))
 total.pop = data.frame(time = 1:length(Nall), pop = Nall)
 
 pop.out = as.data.frame(pop.out)
-names(pop.out) = c("fam.size", "dis.status", "grid.loc", "move.dis", "x.now", "y.now", "prev.loc", "S.num", "E.num", "I.num", "Z.num", "time")
+names(pop.out) = c("fam.size", "dis.status", "grid.loc", "move.dis", "x.now", "y.now", "prev.loc", "S.num", "E.num", "I.num", "Z.num", "fam.id", "time")
 
 #send to list
 list.all = list("Tinc" = Tinc,

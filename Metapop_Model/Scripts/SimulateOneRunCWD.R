@@ -1,12 +1,13 @@
 ##The purpose of this script is to run a single rep of the CWD model
 
-SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
-                         F1, F2, B1,
-                         B1P.m, B1P.inter,
-                         thyme, cells, N0, K,
-                         shift, centroids, inc, fs,
-                         midpoint, pop, I0, 
-                         ss.loc, ss.time, ss.radius, ss.eff){
+SimulateOneRunCWD = function(Pbd, death, lat.period, inf.period,
+                             shed, corpse.burst,
+                             F1, F2, B1,
+                             B1P.m, B1P.inter,
+                            thyme, cells, N0, K,
+                            shift, centroids, inc, fs,
+                            midpoint, pop, I0, 
+                            ss.loc, ss.time, ss.radius, ss.eff){
 
   ###########################################
   ######## Initialize Output Objects ######## 
@@ -61,11 +62,11 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
   i = 2
   
   for(i in 2:thyme){
-    if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
-    # if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
+    # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
+    if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
         
       print(i)
-      # print(pop)
+      print(dim(pop)[1])
       
       #####################################
       ######## Track I locations ######## 
@@ -96,7 +97,7 @@ SimulateOneRunCWD = function(Pbd, death, shed, corpse.burst,
                                 Pbd,
                                 B1, F1, F2,
                                 B1P.m, B1P.inter, 
-                                K, death,
+                                K, death, lat.period, inf.period,
                                 Incidence, BB, i, 
                                 landscape.prions) 
       pop = st.list[[1]]

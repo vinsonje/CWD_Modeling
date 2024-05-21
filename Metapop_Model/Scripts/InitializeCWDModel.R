@@ -11,7 +11,6 @@ rm(list = ls())
 ######################
 ####Set directories
 #####################
-# setwd("~/Desktop/IBM_files/Metapop Model") #for my Mac
 setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model/Scripts") #for my PC
 
 ######################
@@ -49,20 +48,20 @@ area = grid.xmax * grid.ymax #total area of the grid
 
 #host demographic parameters
 N0 = density*area #initial population size
-K = floor(N0*1.5) #carrying capacity for whole population
+K = N0 #carrying capacity for whole population
 fs = 12 #average family size
 
-death = 7/(365*3) #assume pop growth rate of 1.5 so make death rate = birth rate*(1/1.5); 1/(365*3); % natural death rate for S and R
-mc_time = 0.0027 #this is just a rounding of 1/365
-Pbd = 7*mc_time #; %repmat(mean(c_time(1:364/7)),time,1).*1; % constant birth rate for S; rescale trend as needed to produce realistic pop dynamics
+death = 1/(20*7) #assume pop growth rate of 1.5 so make death rate = birth rate*(1/1.5); 1/(365*3); % natural death rate for S and R
+Pbd = 1.5 #; %repmat(mean(c_time(1:364/7)),time,1).*1; % constant birth rate for S; rescale trend as needed to produce realistic pop dynamics
 
 #host relocation parameters
-shift = c(0.4, 0.3550) #shape and scale of the gamma distribution that defines how far they relocate on the landscape
+shift = c(1.0, 0.3550) #shape and scale of the gamma distribution that defines how far they relocate on the landscape
 inc = 1.0 #home range size of the population (basically, if they are drawn to relocate lower than this number they don't relocate)
 
 #disease parameters
 shed = 20 #the shedding rate of infected deer (mean of poisson distribution)
-
+lat.period = 1/3
+inf.period = 1/6
 
 ######################
 ####Create grid
@@ -78,8 +77,11 @@ midpoint = c(max(centroids[,1]/2),max(centroids[,2]/2))
 #########################
 ####Define Contact Rules
 #########################
-F1 = 0.7381
-B1 = 0.4
+# F1 = 0.7381
+# B1 = 0.4
+
+F1 = 0
+B1 = 0
 
 #########################
 ####Movement model for population
@@ -106,8 +108,11 @@ F2_B = F2$coef[[2]]
 ##########################
 #Prion transmission parameters
 ########################
-B1P.m = -1
-B1P.inter = 200
+# B1P.m = -1
+# B1P.inter = 200
+
+B1P.m = 0
+B1P.inter = 0
 
 corpse.burst = 300
 
@@ -130,14 +135,15 @@ ss.eff = 0.5
 #####################
 ####RunModel
 #####################
-# sim_output = SimulateOneRunCWD(Pbd, death, shed, corpse.burst,
-#                                F1, F2, B1,
-#                                B1P.m, B1P.inter,
-#                                thyme, cells, N0, K,
-#                                shift, centroids, inc, fs,
-#                                midpoint, pop, I0,
-#                                ss.locs, ss.times, ss.radius, ss.eff)
-# 
+sim_output = SimulateOneRunCWD(Pbd, death, lat.period, inf.period,
+                               shed, corpse.burst,
+                               F1, F2, B1,
+                               B1P.m, B1P.inter,
+                               thyme, cells, N0, K,
+                               shift, centroids, inc, fs,
+                               midpoint, pop, I0,
+                               ss.locs, ss.times, ss.radius, ss.eff)
+
 #output is a list with 
 # [1] Total infected/incidence
 # [2] Time of last infected
@@ -151,5 +157,5 @@ ss.eff = 0.5
 # [10] Dataframe of time and total population size at each time point
 # [11] Long dataframe of pop. at each time point
 
-# plot.landscape.meta(sim_output, grid.xmax, grid.ymax)
+plot.landscape.meta(sim_output, grid.xmax, grid.ymax)
 

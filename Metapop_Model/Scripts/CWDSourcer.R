@@ -9,6 +9,9 @@ source(paste(getwd(), "/areaOfInfectionCWD.R", sep = ''))
 source(paste(getwd(), "/GetOutputsCWD.R", sep = ''))
 source(paste(getwd(), "/CWD_plots.R", sep = ''))
 source(paste(getwd(), "/sharpshootingCWD.R", sep = ''))
+source(paste(getwd(), "/movementCWD.R", sep = ''))
 
-Rcpp::sourceCpp("./Movement_Parallel_Functionsmall.cpp", verbose=TRUE)
+
+# Rcpp::sourceCpp("./Movement_Parallel_Functionsmall.cpp", verbose=TRUE)
+# Rcpp::sourceCpp("./Movement_Parallel_Functionsmall2.cpp", verbose=TRUE)
 # Rcpp::sourceCpp("./Fast_FOI_ParallelCWD.cpp", verbose=TRUE)
