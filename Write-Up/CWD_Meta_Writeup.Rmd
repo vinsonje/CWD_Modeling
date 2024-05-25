@@ -56,33 +56,11 @@ This is done by creating a family with a single individual that is infectious at
 setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model/Scripts")
 source(paste(getwd(), "/CWDSourcer.R", sep = ''))
 
-#grid/landscape parameters
-grid.xmax = 100
-grid.ymax = 100
-cell.x.size = 1.0
-cell.y.size = 1.0
-density = 5 #density per X
-area = grid.xmax * grid.ymax #total area of the grid
-
-#host demographic parameters
-N0 = density*area #initial population size
-K = floor(N0*1.5) #carrying capacity for whole population
-fs = 12 #average family size
-
-grid = create.grid(grid.xmax, grid.ymax, cell.x.size, cell.y.size)
-
-centroids = grid[,6:7]
-cells = nrow(grid)
-
-pop = InitializeFamilies(N0, fs, cells, centroids, 0, 0, 0)
-
-midpoint = c(max(centroids[,1]/2),max(centroids[,2]/2))
-id = which(centroids[, 1] >= midpoint[1] & centroids[, 2] >= midpoint[2])[1] 
-
+pop = init.CWD()[[1]]
 
 ggplot() + geom_point(aes(x = pop[,5], y = pop[,6], color = pop[,1])) + 
   # geom_text(aes(x = grid[,6], y = grid[,7], label=grid[,1]), alpha=0.75, color="#997009", size = 3.0) +
-  geom_point(aes(x = centroids[id,1], y = centroids[id,2]), shape = 17, size = 3, color = "#FF69B4") +
+  geom_point(aes(x = tail(pop[,5], 1), y = tail(pop[,6], 1)), shape = 17, size = 3, color = "#FF69B4") +
   theme_cowplot() + ylab("Y (km)") + xlab("X (km)") + 
   scale_color_gradient(name = "family size", low = "#009b00", high = "#002000")
 ```
@@ -101,30 +79,129 @@ This is a large process that encapsulates many different demographic and epidemi
 
 ##### Births
 
+We assumed an underlying logistic growth model, meaning that in the absence of disease, the population ($N$) dynamics should be described by: 
+
+$$
+\frac{dN}{dt} = b N (1 - \frac{N}{K}) - dN
+$$
+Here, **K** is the maximum number of individuals that can be supported on the landscape (carrying capacity), b is the birth rate, and d is the death rate. 
+
+To simulate birth events, we calculate the density-dependent births (DDB; $b N (1 - \frac{N}{K})$) using **Pbd** as the birth rate, $b$. Because there could be instances where the population is above K, we set the DDB to have a minimum of 0, meaning the DDBR is 0 when the population is at or above K. We then sample the number of new individuals (i.e. the number of births) from a Poisson distribution with a mean of DDB. Because these individuals need to be distributed across all families, we separate these new individuals into subgroups that sum to the total number of new individuals. To control the births so that one cell does not result in the majority of births, we set a maximum number of new individuals per group to 10. We determine which cells are assigned these groups.   
+
+
 ##### Natural deaths
+
+To simulate natural death events, we calculate the probability of natural mortality using the *lifespan* parameter: 
+
+$$
+p(lifespan) = 1 - e^{-\frac{1}{lifespan}}
+$$
+
+Using this probability ($p(d)$), we go through *each live* individual in the population and determine if they die from natural causes. 
 
 ##### Transitions
 
-##### Infection events
+##### Infection events (S -> E)
+
+Individuals can become infected through two way, direct and environmental (via prions) transmission. 
+
+###### Force of Infection
+
+The force of infection ($\lambda$) is defined as the (per capita) rate that susceptible individuals become infected. The probability that an susceptible individual becomes infected is: 
+
+$$
+p(\lambda) = 1 - e^{-\lambda}
+$$
+
+The force of infection can be broken down into three components: the contact rate between individuals, probability that the contact is with an infected individual, and the probability of successful transmission given a contact. Here, we will simplify this as we can calculate the probability of contact with an infected individual and provide the probability of transmission given contact. 
+
+As there are two ways that individuals can become infected, we need to calculate them separately. Also, because location contributes to contact probabilities (and rates) each cell should have a unique force of infection. 
 
 ###### Direct Transmission
 
+An susceptible individual can become infected through a contact with an infectious individual. To determine this probability of this occurring, we need to calculate the probability of contact given the distance between two cells. Using a glm fitted to direct contact data (right now I'm using fake data; **F2_int** and **F2_B**), for every cell with infectious (I) individuals, we determine the probability of contact the individuals in those cells have with all other cells in the landscape. We then multiply each probability of contact with the probability of successful direct transmission (**B1**).  We assumed that within cell transmission may have a different probability of transmission (**F1**). These are then summed for each cell on the landscape, to get the cumulative force of infection exerted on each cell on the landscape from all "infected" cells ($B_{D}$).
+
 ###### Environmental (prion) transmission
+
+A susceptible individual can become infected through "contact" with prions on the environment (cells). To determine the probability of this occurring, we need to calculate the probability of contact with prions in a cell given the distance between two cells. Using a glm fitted to indirect contact data (right now using fake data; ) for every cell with prions on them, we determine the probability of contact that individuals in cells on the landscape have with the prions on those prion-infected cells. Since the probability of successful transmissions could be a function of the number of prions on a cell, we assume a logistic relationship between the number of prions in a cell ($P$), and the probability of successful transmission via prions ($p(P)$): 
+
+$$
+p(P) = \frac{1}{1 + e^{B1P.m P + B1P.inter}}
+$$
+
+Here, **B1P.m** controls how quickly the probability switches from ~0 to ~1.0 and **B1P.inter** controls where at what value of P the switch occurs. We multiply the indirect contact probability with the probability of successful prion transmission. These are summed for each cell on the landscape to get the cumulative force of infection exerted by prion infected cells on each cell the landscape ($B_{P}$). 
+
+
+To get the total force of infection/transmission ($\lambda$), we need to sum the transmission from direct and environmental (prions). Using the probability of infection ($p(\lambda)$) for each cell on the landscape, we got through each susceptible individual to determine if they become infected. 
+
+##### Latent period (E -> I)
+
+Individuals who become infected transition to the exposed class, where they are infected but are not capable of transmitting the parasite or shed prions into the environment, yet. On average, individuals become infectious **latent.period** time units after becoming infected. The probability that an exposed individual becomes infectious is:
+
+$$
+p_{EI} = 1 - e^{-\frac{1}{latent.period}}
+$$
+
+We go through each exposed individual and determine if they transition to infectious. 
+
+##### Disease induced mortality (I -> Dead)
+
+Along with dying due to natural causes, infectious individuals (I) can die through infection. On average, infectious individuals die due to infection after **infectious.period** time units. The probability that an infectious individual dies due to infection is:
+
+$$
+p_{EI} = 1 - e^{-\frac{1}{latent.period}}
+$$
+
+When these individuals die due to infection, they are moved to a compartment representing infectious corpses. These are kept track of as they lead to a burst of prions into the cell they die in (corpse burst).
 
 #### Shedding
 
+Infectious individuals shed prions into the currently occupied cell at an average rate **shed**. To determine how many each individual sheds into their cell, we loop throuhg each infectious individual and drawn the number they shed from a Poisson distribution with mean **shed**. 
+
 #### Corpse burst
+
+Corpses of infectious individuals who die from infection release a large number of prions into the environment. For simplicity, we assume that these corpses only do a single release in the same time step that they died. On average a corpse releases **corpse.burst** prions in the cell they died in. To determine the number each one releases, we go through each corpse on the landscape and the number they release is drawn from a Poisson distribution with mean **corpse.burst**. 
 
 #### Removal of prions
 
+Prions do not stay in the indefinitely. Currently, each time step, 25% of the prions are removed from each cell on the landscape. 
 
 #### Harvesting
 
+Along with natural, and disease-induced, mortality, individuals on the landscape are at risk of removal via harvesting, or hunting. Prior to running a simulation, we assign time points (**h.time**) and locations (**h.loc**) that harvesting can happen on the landscape. Additionally, the number of individuals at each location (**h.num**) is assigned. At each location, harvesting can affect all the individuals within a radius (**h.radius**) around the cell. To determine which individuals are harvested within the radius, we randomly sample from all individuals. We keep track of individuals who are harvested.
 
 #### Surveillance
 
+To determine where to sharpshoot, we use the individuals that are harvested. Prior to starting a simulation, we assign the time that surveillance starts (**sur.start**). Of all the harvested individuals prior to this time point, **test.rate** of the harvested are tested for CWD. When tested, these tests are not perfect and we assign the true positive accuracy, the proportion of E (**true.pos.E**) and I (**true.pos.I**) that are correctly identified as infected, and the true negative accuracy, the proportion of S (**true.neg**) that are correctly identified as not infected. Using these identifications, we then determine where these infected (both correctly and incorrectly identified) are located. 
 
 #### Sharpshooting
+
+Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Prior to running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location that it occurs. But, rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**).
+
+
+### Tracking statistics/measures
+
+Rather than keeping track of the entire population as an output, which is very data heavy, we keep track of the quantities of interest that are important for understanding transmission dynamics and the spatial spread of the pathogen. Each time step, we record: 
+
+- the total population size
+- total number of births
+- location of positive identified individuals
+- the number of new infections, incidence
+- the locations of infected individuals
+- the total number of infected individuals
+- the area that infected individuals occupy on the landscape
+- the max distance between two infected individuals
+- number of cells that have infected individuals in them
+- the locations of cells that prions in them and how many are in each
+
+
+### Summarizing Dynamics
+
+We need to use the measures that we keep track of each time step to get other outputs to understand transmission. 
+
+Overall, our outputs for each simulation are: 
+
+
 
 ## Parameters
 

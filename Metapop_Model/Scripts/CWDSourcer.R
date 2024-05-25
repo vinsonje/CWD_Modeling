@@ -1,3 +1,22 @@
+
+
+
+#load in libraries
+library(Rcpp)
+library(profvis)
+library(R.matlab)
+library(pracma)
+library(rdist)
+library(tidyverse)
+library(microbenchmark)
+library(cowplot)
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(cowplot)
+library(gridExtra)
+library(magick)
+
 #Source File
 source(paste(getwd(), "/CreateGrid.R", sep = ''))
 source(paste(getwd(), "/InitializeFamilies.R", sep = ''))
@@ -10,8 +29,11 @@ source(paste(getwd(), "/GetOutputsCWD.R", sep = ''))
 source(paste(getwd(), "/CWD_plots.R", sep = ''))
 source(paste(getwd(), "/sharpshootingCWD.R", sep = ''))
 source(paste(getwd(), "/movementCWD.R", sep = ''))
-
-
-# Rcpp::sourceCpp("./Movement_Parallel_Functionsmall.cpp", verbose=TRUE)
-# Rcpp::sourceCpp("./Movement_Parallel_Functionsmall2.cpp", verbose=TRUE)
-# Rcpp::sourceCpp("./Fast_FOI_ParallelCWD.cpp", verbose=TRUE)
+source(paste(getwd(), "/CWDparms.R", sep = ''))
+source(paste(getwd(), "/shedCWD.R", sep = ''))
+source(paste(getwd(), "/corpse_burstCWD.R", sep = ''))
+source(paste(getwd(), "/prion_removalCWD.R", sep = ''))
+source(paste(getwd(), "/harvestingCWD.R", sep = ''))
+source(paste(getwd(), "/summarizeCWD.R", sep = ''))
+source(paste(getwd(), "/InitializeCWDModel.R", sep = ''))
+source(paste(getwd(), "/surveillanceCWD.R", sep = ''))

@@ -2,13 +2,14 @@
 #This will replace the various state variable matrices (ie S, I)
 #instead, values will be assigned to indicate statuses and location
 
-#N0-population size, determined in InitializeCWDModel using given density and area of grid
+#N0-population size, using given density and area of grid
 #fs-average family size, setting manually
 #centroids-center coordinates of each cell
-#type- if 0, initialize population for start of population; else, use init_locs and total number to initialize new births in population
+#type- if 0, initialize population for start of population; else, use init_locs and total number to initialize an infected individual
 #init_locs- used for births
-#n-number of births
-InitializeFamilies <- function(N0, fs, cells, centroids, type, init_locs, n){
+#n-number of infected individuals
+
+InitializeFamilies <- function(N0, fs, cells, centroids, type, init_locs){
   if(type==0){
     
     fn_i = N0/fs #Get the initializing number of families
@@ -36,17 +37,17 @@ InitializeFamilies <- function(N0, fs, cells, centroids, type, init_locs, n){
     
   } else{ 
     
-    fam.size = n #family size with avg as lambda in a poisson
-    dis.status = rep(0, 1) #this will be disease status
+    fam.size = fs #family size with avg as lambda in a poisson
+    dis.status = 1 #this will be disease status
     grid.loc = init_locs #this will be grid location (row number)
-    move.dis = rep(0, 1) #this will be assigned movement distance
+    move.dis = 0 #this will be assigned movement distance
     x.now = centroids[grid.loc,1] #present location X 
     y.now = centroids[grid.loc,2] #present location Y
     prev.loc = init_locs #previous location (grid row number)	
-    S.num = fam.size #number of S status in family (susceptible)
-    E.num = rep(0, 1) #number of E status in family (exposed)
-    I.num = rep(0, 1) #number of I status in family (infectious)
-    Z.num = rep(0, 1) #number of Z status in family (dead)
+    S.num = 0 #number of S status in family (susceptible)
+    E.num = 0 #number of E status in family (exposed)
+    I.num = fs #number of I status in family (infectious)
+    Z.num = 0 #number of Z status in family (dead)
     fam.id = -999
     
     pop =  matrix(c(fam.size, dis.status, grid.loc, move.dis, x.now, y.now, prev.loc, S.num, E.num, I.num, Z.num, fam.id), byrow = FALSE, ncol = 12)

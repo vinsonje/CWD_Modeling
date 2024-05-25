@@ -1,86 +1,72 @@
 ##The purpose of this script is to run a single rep of the CWD model
 
-SimulateOneRunCWD = function(Pbd, death, lat.period, inf.period,
-                             shed, corpse.burst,
-                             F1, F2, B1,
-                             B1P.m, B1P.inter,
-                            thyme, cells, N0, K,
-                            shift, centroids, inc, fs,
-                            midpoint, pop, I0, 
-                            ss.loc, ss.time, ss.radius, ss.eff){
-
-  ###########################################
-  ######## Initialize Output Objects ######## 
-  ###########################################
-  Nall = matrix(nrow = thyme) #track total abundance
-  BB = matrix(nrow = thyme) #track births
+SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE){
   
-  POSlive_locs = as.list(rep(0,thyme))
-
-  Spread = matrix(0, nrow = thyme, ncol = 3) #number of infectious individuals, area of infection, max distance between any two cases
-  Incidence = matrix(0, nrow = thyme) #store new cases for each time step
+  #load in parmeters
+  source(paste(getwd(), "/CWDParms.R", sep = ''))
   
+  #determine cells
+  cells = dim(centroids)[1]
+  
+  ###########################################
+  ####### Initialize Tracked Objects ########
+  ###########################################
+  
+  #track total abundance
+  Nall = matrix(0, nrow = thyme) 
+  Nall[1] = sum(pop[,1])
+  
+  #track births
+  BB = matrix(0, nrow = thyme) 
+  
+  #number of infected cells, area of infection, max distance between any two cases
+  Spread = matrix(0, nrow = thyme, ncol = 3) 
+  
+  #store new cases for each time step
+  Incidence = matrix(0, nrow = thyme) 
+  Incidence[1] = I0
+  
+  #track the locations of cells with I
   I_locs = vector("list", thyme)
   I_locs[1:thyme] = NA
   
-  Itrue = matrix(0, nrow = thyme, ncol = 1)
-
+  #track the number of SEI individuals
+  Ssums = matrix(0, nrow = thyme, ncol = 1)
+  Esums = matrix(0, nrow = thyme, ncol = 1)
   Isums = matrix(0, nrow = thyme)
-
-  out = matrix(c(0, 0, 0), nrow=thyme, ncol=3)
   
-  landscape.prions = data.frame(centroids, prions = rep(0, dim(centroids)[1]))
+  #track the number of cells with SEI individuals
+  Scells = matrix(0, nrow = thyme, ncol = 1)
+  Ecells = matrix(0, nrow = thyme, ncol = 1)
+  Icells = matrix(0, nrow = thyme)
+  
+  #initialize the prions
   landscape.prions.out = data.frame(landscape.prions, time = rep(0, dim(landscape.prions)[1]))
   
-  ######################################
-  ######## Initialize Infection ######## 
-  ######################################
-  num_inf_0 = I0 #how many individuals to infect starting off
+  #harvest
+  harvest.out = matrix(0, ncol = 5)
+  harvest.yearly = matrix(0, ncol = 5)
   
-  #find the midpoint of the grid
-  id = which(centroids[, 1] >= midpoint[1] & centroids[, 2] >= midpoint[2])[1] #location on grid closest to midpoint
+  #total pop data
+  pop.out = cbind(pop, time = 0)
   
-  infected = InitializeFamilies(N0,ss,cells,centroids,num_inf_0,id,1)
-  infected[,8] = 0
-  infected[,10] = 1
-  
-  #combine infected pig with pop matrix
-  pop = rbind(pop,infected)
-  
-  #track first infection in Incidence matrix
-  Incidence[1] = num_inf_0
-  
-  Nall[1] = sum(pop[,1])
-  
-  pop.out = cbind(pop, rep(1,dim(pop)[1]))
+  #surveillence data
+  surv.out = NULL
+  surv.yearly = NULL
+ 
+  #SS data
+  SS.out = NULL
   
   ##################################
   ######## Start simulation ######## 
   ##################################
-  #start the timestep loop
-
-  i = 2
   
-  for(i in 2:thyme){
-    # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
-    if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
+  #start the timestep loop
+  for(i in 1:thyme){
+    if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
+    # if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
         
       print(i)
-      print(dim(pop)[1])
-      
-      #####################################
-      ######## Track I locations ######## 
-      #####################################
-      print("tracking I locations")
-      if(nrow(pop[pop[, 10] > 0, ,drop = FALSE]) > 0){
-        Isums[i] = nrow(pop[pop[, 10] > 0, , drop = FALSE])
-      } else{Isums[i] = 0}
-
-      if(any(pop[, 10] > 0)){		
-        I_locs[[i]] = rep(pop[pop[, 10] > 0, 3], pop[pop[, 10] > 0, 10])
-      } else{
-        I_locs[[i]] = pop[pop[, 10] > 0, 3]
-      }
   
       ##########################
       ######## Movement ######## 
@@ -97,7 +83,7 @@ SimulateOneRunCWD = function(Pbd, death, lat.period, inf.period,
                                 Pbd,
                                 B1, F1, F2,
                                 B1P.m, B1P.inter, 
-                                K, death, lat.period, inf.period,
+                                K, lifespan, lat.period, inf.period,
                                 Incidence, BB, i, 
                                 landscape.prions) 
       pop = st.list[[1]]
@@ -108,107 +94,116 @@ SimulateOneRunCWD = function(Pbd, death, lat.period, inf.period,
       ####### Shedding ###############
       ################################
       print("starting shedding")
-      Imat = pop[pop[,10] > 0, , drop = FALSE]
-      
-      if(dim(Imat)[1]>0){
-        
-      for(k in 1:dim(Imat)[1]){
-        
-        prions.shed = rpois(Imat[k,10], shed)
-        # print(paste(prions.shed, "prions"))
-        land.index = intersect(which(landscape.prions[,1] == Imat[k,5]), which(landscape.prions[,2] == Imat[k,6]))
-        
-        landscape.prions[land.index,]$prions = landscape.prions[land.index, ]$prions + sum(prions.shed)
-      }
-        
-      }#end of if statement to test if there are any Is
-      
+      landscape.prions = shedCWD(pop, landscape.prions, shed)
+
       ################################
       ####### Corpse Burst ###########
       ################################
       print("starting corpse burst")
-      #corpse burst function
+      corpse.burst.out = corpse_burstCWD(pop, landscape.prions, corpse.burst)
+      pop = corpse.burst.out[[1]]
+      landscape.prions = corpse.burst.out[[2]]
       
       
       ################################
       ####### Removal of prions #######
       ################################
       print("starting prions removal")
-      for(l in 1:dim(landscape.prions)[1]){
-        landscape.prions$prions[l] = floor(landscape.prions$prions[l] * 0.25) #this should be a parameter in the model
-      }
-      
-      landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
-      landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
+      landscape.prions = prion.removal(landscape.prions, prion.lifespan)
       
       ##############################
       ######### Harvesting #########
       ##############################
       print("starting harvesting")
-      #harvesting function
-      
+      harvest.event.out = harvestingCWD(pop, centroids, h.permits, h.times, h.radius, h.num, i)
+      pop = harvest.event.out[[1]]
+      harvest.out = rbind(harvest.out, harvest.event.out[[2]])
+      harvest.yearly = rbind(harvest.yearly, harvest.event.out[[2]])
+
       ##############################
       ######### Surveillance #######
       ##############################
       print("starting surveillance")
-      #surveillance function
+      surv.event.out = surveillance.fun(harvest.yearly, test.rate, true.pos.E, true.pos.I, true.neg, sur.start, i)
       
-      
+      surv.yearly = rbind(surv.yearly, surv.event.out[[1]])
+      harvest.yearly = surv.event.out[[2]]
+      surv.out = rbind(surv.out, surv.event.out[[1]])
+    
       ###############################
       #### Sharpshooting ############
       ###############################
       print("starting sharpshooting")
-      pop = sharpshootingCWD(pop, centroids, ss.loc, ss.time, ss.radius, ss.eff, thyme)
+      SS.event.out = sharpshootingCWD(pop, centroids, surv.yearly, ss.shooters, ss.times, ss.radius, ss.eff, ss.strat, i)
       
-      #############################
-      ####Track true spatial spread
-      #############################
-      print("starting true spatial spread")
-      #if any infected individuals
-      if(nrow(pop[pop[, 9, drop = FALSE] > 0 | pop[ , 10, drop = FALSE] > 0, , drop = FALSE]) > 0){
-        
-        out[i,] = areaOfinfectionCWD(pop, centroids, inc)
-        
-      } else{out[i,] = c(0,0, 0)}
+      pop = SS.event.out[[1]]
+      surv.yearly = SS.event.out[[2]]
+      SS.out = rbind(SS.out, SS.event.out[[3]])
       
-      #############################
-      ####Summarize infections
-      #############################
-      print("summarizing infections")
-      #sum all infectious cases (I,C,E) at each timestep
-      #Itrue = sum(I + C,2); sum of all infectious cases over time
-      if(i==1){Itrue[i] = num_inf_0}
-     else{
-       Itrue[i] = sum(colSums(pop)[c(9, 10)])
-      }
+      ################################
+      ###########Summarize############
+      ################################
+      print("Summarizing")
+      summary.pop = summarizeCWD(pop, track.pop, i)
 
-      #############################
-      ####Summarize total population size
-      #############################
-      print("summarizing total population size")
-      Nall[i] = sum(pop[,1])
-      pop.temp = cbind(pop, time = i)
-      pop.out = rbind(pop.out, pop.temp)
+      Ssums[i,] = summary.pop[[1]]
+      Esums[i,] = summary.pop[[2]]
+      Isums[i,] = summary.pop[[3]]
+      Scells[i,] = summary.pop[[4]]
+      Ecells[i,] = summary.pop[[5]]
+      Icells[i,] = summary.pop[[6]]
       
-      #comment brackets below for manual testing
+      I_locs[[i]] = summary.pop[[7]]
+      
+      Spread[i,] = summary.pop[[8]]
+      
+      Nall[i,] = summary.pop[[9]]
+      pop.out = rbind(pop.out, summary.pop[[10]])
+      
+      landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
+      landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
+      
     }else{print("Exiting loop, no infections")} #if any infected closing bracket/else
     
   } #for timestep closing bracket
   
-  #############################
-  #############################
+    #############################
+    #############################
+  harvest.out = harvest.out[-which(harvest.out[,1] == 0), , drop = FALSE]
   
+  pop.out = as.data.frame(pop.out)
+  names(pop.out) = c("fam.size", "dis.status", "grid.loc", "move.dis", "x.now", "y.now", 
+                     "prev.loc", "S.num", "E.num", "I.num", "Z.num", "fam.id", "time")
   
-  print("calculating outputs")
-  out.list = GetOutputsCWD(pop, Incidence, out,
-                       I_locs, 
-                       POSlive_locs, Isums,
-                       landscape.prions.out, Nall,
-                       pop.out)
+  out.list = list(Nall, 
+           Ssums, Esums, Isums,
+           Scells, Ecells, Icells,
+           I_locs, Spread,
+           BB, Incidence,
+           harvest.out, surv.out, SS.out,
+           pop.out, landscape.prions.out)
 
   return(out.list)
 
 } #function closing bracket
+
+#[[1]] Total pop size vec
+#[[2]] S num vec
+#[[3]] E num vec
+#[[4]] I num vec
+#[[5]] S cell num vec
+#[[6]] E cell num vec
+#[[7]] I cell num vec
+#[[8]] I locs list
+#[[9]] Spread matrix
+#[[10]] Births vec
+#[[11]] Incidence vec
+#[[12]] Harvest df
+#[[13]] Surveillance df
+#[[14]] Sharpshooting df
+#[[15]] Pop df (if track.pop == TRUE, all timesteps)
+#[[16]] landscape prions df
+
 
 
 

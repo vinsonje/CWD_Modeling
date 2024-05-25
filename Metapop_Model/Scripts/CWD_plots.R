@@ -1,21 +1,14 @@
 #Plotting the simulation
-library(cowplot)
-library(ggplot2)
-library(gganimate)
-library(gifski)
-library(cowplot)
-library(gridExtra)
-library(tidyr)
-library(magick)
+
 
 plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=21, gif.fps=20, save=FALSE){
   
   #Prion Heatmap
-  p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[9]]), aes(x = X1, y = X2, fill = prions)) + 
+  p.prions = ggplot() + geom_tile(data = data.frame(sim_output[[16]]), aes(x = X1, y = X2, fill = prions)) + 
     theme_cowplot() + scale_fill_gradient(low = "white", high = "red") + xlim(0, grid.xmax) + ylim(0, grid.ymax)
   
   #Plot where infectious are through time
-  I.loc.list = sim_output[[6]]
+  I.loc.list = sim_output[[8]]
   I.loc.df = data.frame()
   for(j in 1:length(I.loc.list)){
     I.loc = unlist(I.loc.list[j])
@@ -42,17 +35,18 @@ plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=21, gi
   I.loc.df.final$time = as.numeric(I.loc.df.final$time)
   
   p.inf = ggplot() + geom_tile(data = I.loc.df.final, aes(x = x.loc, y = y.loc, fill = num)) +
-    geom_point(data = sim_output[[11]], aes(x = x.now, y = y.now, color = as.factor(fam.id))) +
+    geom_point(data = sim_output[[15]], aes(x = x.now, y = y.now, color = as.factor(fam.id))) +
     theme_cowplot() + scale_fill_gradient(low = "white", high = "blue") + xlim(0, grid.xmax) + ylim(0, grid.ymax) + 
     scale_color_manual(values = rep("black", 200), guide = "none")
 
   #Infection Abundance
-  I.time = data.frame(time = 1:length(sim_output[8]$Isums), I = sim_output[8]$Isums)
+  I.time = data.frame(time = 1:length(sim_output[[4]]), I = sim_output[[4]])
   
   p.inf.line = ggplot(I.time) + geom_line(aes(x = time, y = I), color="black") + theme_cowplot()
   
   #total abundance
-  p.pop.line = ggplot(sim_output[[10]]) + geom_line(aes(x = time, y = pop)) + theme_cowplot()
+  N.time = data.frame(time = 1:length(sim_output[[1]]), pop = sim_output[[1]])
+  p.pop.line = ggplot(N.time) + geom_line(aes(x = time, y = pop)) + theme_cowplot()
   
   
   p.ani.prions = p.prions + transition_time(time) + labs(title = "Time: {frame_time}")

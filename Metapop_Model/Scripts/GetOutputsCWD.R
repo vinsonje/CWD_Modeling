@@ -2,20 +2,9 @@ GetOutputsCWD = function(pop, Incidence, out,
 										 I_locs, POSlive_locs, 
 										 Isums, landscape.prions, Nall,
 										 pop.out){
-	
-#List of outputs created here:	
-	#Tinc #sum of all exposures over simulation 
-	#sum(Tculled)
-	#idT #last day there is an infectious individual
-	#Mspread #max spread of infection
-	#I_locs
-	#C_locs
-	#POSlive_locs
-	#POSdead_locs
 
-
-#Tinc, this just sums all of the exposures
-Tinc = sum(Incidence)
+#Tinf, this just sums all of the new infections
+Tinf = sum(Incidence)
 
 #Find last day there was an infectious individual
 idT = which(Isums != 0)[length(which(Isums != 0))]

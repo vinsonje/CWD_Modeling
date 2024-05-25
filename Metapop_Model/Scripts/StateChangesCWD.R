@@ -35,7 +35,7 @@ StateChangesCWD = function(pop, centroids, cells,
   ########################################
   ######## Determine Death Prob ########## 
   ########################################  
-  Pdeath = 1 - exp(-death)
+  Pdeath = 1 - exp(-1/death)
   
   ########################################
   ########### Determine Births ########### 
@@ -78,7 +78,7 @@ StateChangesCWD = function(pop, centroids, cells,
       id2 = sample(1:nrow(pop), length(id))
       
     } else {
-      #%if there are more births than cells only add births cells where the individuals are (so fewer births will be happening)
+      #if there are more births than cells only add births cells where the individuals are (so fewer births will be happening)
       id2 = sample(1:length(liverows), length(liverows))
     }
   
@@ -99,8 +99,8 @@ StateChangesCWD = function(pop, centroids, cells,
   #Pse is the probability of becoming infected for each S individual in each family; 
   #it is organized as a vector with the the probability of each cell on the landscape
 
-  Pei = 1 - exp(-lat.period) #transitions exposure to infected
-  Pid = 1 - exp(-inf.period) #transitions infected to either dead 
+  Pei = 1 - exp(-1/lat.period) #transitions exposure to infected
+  Pid = 1 - exp(-1/inf.period) #transitions infected to either dead 
   
   
   ###############################################

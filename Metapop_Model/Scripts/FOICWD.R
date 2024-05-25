@@ -131,7 +131,7 @@ FOICWD = function(pop, centroids, cells,
         #calculate the FOI that infected cell i has on each cell on the landscape
         #need to determine the prob. of successful transmission as a function of the number of prions
         B1P.real = 1/(1+exp(B1P.m*Pmat[i,3] + B1P.inter))
-        B_P[,i] = (pdP[i,,2] * B1P.real) #NEED TO PUT THE LOGISTIC FUNCTION HERE FOR PROB OF PRION TRANSMISSION SUCCESS
+        B_P[,i] = (pdP[i,,2] * B1P.real)
       }
       
       #to calculate each cell on the landscape has coming from all infected cells

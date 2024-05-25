@@ -5,14 +5,18 @@
 #surveillance of CWD from harvested individuals. 
 #It has inputs of:
 #harvest.data = dataframe of the harvested individuals
-#true.pos = parameter for the true positive rate
-#true.neg = parameter for the true negative rate
+#true.pos = parameter for the true positive accuracy
+#true.neg = parameter for the true negative accuracy
 #sur.start = time that the surveillance starts
 #########################################
 
 surveillance.fun = function(harvest.data, test.rate, true.pos.E, true.pos.I, true.neg, sur.start, thyme){
   
+  if(any(harvest.data[,1] == 0)){harvest.data = harvest.data[-which(harvest.data[,1]==0), , drop = FALSE]}
+  
   SS.locs = NULL
+  harvest.data.out = harvest.data
+  surv.data.all = NULL
   
   if(thyme %in% sur.start){
     #testing
@@ -48,13 +52,21 @@ surveillance.fun = function(harvest.data, test.rate, true.pos.E, true.pos.I, tru
     E.TP.loc = sample(E.test.loc, E.test.pos, replace = FALSE)
     I.TP.loc = sample(I.test.loc, I.test.pos, replace = FALSE)
     
-    tested.pos.locs = table(c(S.FP.loc, E.TP.loc, I.TP.loc))
+    if(length(S.FP.loc)<1){S.FP.loc = 0}
+    if(length(E.TP.loc)<1){E.TP.loc = 0}
+    if(length(I.TP.loc)<1){I.TP.loc = 0}
     
+    surv.data.all = data.frame(table(rbind(data.frame(loc = S.FP.loc, result = "FP"), 
+                                      data.frame(loc = E.TP.loc, result = "ETP"), 
+                                      data.frame(loc = I.TP.loc, result = "ITP"))))
+    
+    if(any(surv.data.all[,1] == 0)){surv.data.all = surv.data.all[-which(surv.data.all[,1] == 0),]}
+    if(any(surv.data.all[,3] == 0)){surv.data.all = surv.data.all[-which(surv.data.all[,3] == 0),]}
+    names(surv.data.all) = c("loc", "result", "num")
+    
+    harvest.data.out = matrix(0, ncol = 5)
 }#end if statement for starting surv.
   
-  SS.locs = data.frame(tested.pos.locs)
-  names(SS.locs) = c("grid.id", "pos.num")
-  
-  return(SS.locs)
+  return(list(surv.data.all, harvest.data.out))
   
 }#end of function

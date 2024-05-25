@@ -5,22 +5,24 @@
 #harvesting (hunting) on a landscape. It has inputs of:
 #pop = population matrix
 #centroids = centroids matrix
-#h.loc = vector of grid ids where SS happens
-#h.time = vector of times when SS happens
-#h.radius = the radius around the cells centroid where SS is effective
-#h.num = the number of individuals removed at each harvesting event
+#h.permits = number of permits given out per harvesting event
+#h.time = vector of times when harvesting happens
+#h.radius = the radius around the cells centroid where harvesting is effective
+#h.num = the number of individuals removed per permit
 #thyme = the current time of the simulation
 #########################################
 
 #I need to save the individuals and their information to be used in a surveillance
 
-harvestingCWD = function(pop, centroids, h.loc, h.time, h.radius, h.num, thyme){
+harvestingCWD = function(pop, centroids, h.permits, h.time, h.radius, h.num, thyme){
   
   pop.out = pop
   harvest.out = matrix(c(0, 0, 0, 0, 0), nrow = 1)
-  # print(dim(pop.out)[1])
-  
+
   if(thyme %in% h.time){
+    print("starting harvest")
+    h.loc = sample(dim(centroids)[1], h.permits, replace = TRUE)
+    
     for(q in 1:length(h.loc)){
       
       h.loc.id.now = h.loc[q]
@@ -82,13 +84,13 @@ harvestingCWD = function(pop, centroids, h.loc, h.time, h.radius, h.num, thyme){
         
         if(loc %in% E.rem.ct$E.rem.loc){E.rem = E.rem.ct$Freq[which(E.rem.ct$E.rem.loc==loc)]}
         
-        if(loc %in% I.rem.ct$I.rem.loc){S.rem = I.rem.ct$Freq[which(I.rem.ct$I.rem.loc==loc)]}
+        if(loc %in% I.rem.ct$I.rem.loc){I.rem = I.rem.ct$Freq[which(I.rem.ct$I.rem.loc==loc)]}
         
         pop.out[fams.rem.index[f], 8] = pop.out[fams.rem.index[f], 8] - S.rem
         pop.out[fams.rem.index[f], 9] = pop.out[fams.rem.index[f], 9] - E.rem
         pop.out[fams.rem.index[f], 10] = pop.out[fams.rem.index[f], 10] - I.rem
         
-        pop.out[fams.rem.index[f], 1] = sum(pop.out[fams.rem.index[f],8:10])
+        pop.out[fams.rem.index[f], 1] = sum(pop.out[fams.rem.index[f], 8:10])
         
         harvest.out.temp = c(time = thyme, loc = loc, S = S.rem, E = E.rem, I = I.rem)
         harvest.out = rbind(harvest.out, harvest.out.temp)
@@ -96,24 +98,14 @@ harvestingCWD = function(pop, centroids, h.loc, h.time, h.radius, h.num, thyme){
       } #end for loop to remove individuals from each cell
       
     }#end of h.loc loop
+    
+    pop.out = pop.out[which(pop.out[,1]>0),]
+    harvest.out = harvest.out[which(rowSums(harvest.out[,3:5, drop = FALSE])>0), , drop = FALSE]
   }#end of h.time if
   
-  pop.out = pop.out[which(pop.out[,1]>0),]
-  harvest.out = harvest.out[which(rowSums(harvest.out[,3:5, drop = FALSE])>0),]
   rownames(harvest.out) = NULL
   
   return(list(pop.out, harvest.out))
 }#end of function
 
-#testing
-# h.loc = c(11, 265)
-# h.time = 10
-# h.radius = 3.0
-# h.num = 5
-# 
-# thyme = 10
-# 
-# test.pop = pop
-# 
-# harvest.test = harvestingCWD(test.pop, centroids, h.loc, h.time, h.radius, h.num, thyme)
-# harvest.test[[2]]
+
