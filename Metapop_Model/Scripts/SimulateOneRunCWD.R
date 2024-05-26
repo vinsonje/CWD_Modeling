@@ -72,7 +72,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       ######## Movement ######## 
       ##########################
       print("starting movement")
-      pop = FastMovementCWD(pop, centroids, shift, inc)
+      pop = FastMovementCWD(pop, centroids, shift, inc, max.den, move.strat)
       
       ###############################
       ######## State Changes ######## 
@@ -82,7 +82,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       st.list = StateChangesCWD(pop, centroids, cells,
                                 Pbd,
                                 B1, F1, F2,
-                                B1P.m, B1P.inter, 
+                                B1P.m, B1P.inter, F2i,
                                 K, lifespan, lat.period, inf.period,
                                 Incidence, BB, i, 
                                 landscape.prions) 

@@ -16,8 +16,7 @@ HDemo.parms.names = c(
   "N0",
   "K",
   "fs",
-  "death",
-  "mc_time",
+  "lifespan",
   "Pbd"
 )
 
@@ -29,8 +28,8 @@ HMove.parms.names = c(
 )
 
 HContact.parms.names = c(
-  "F2_int",
-  "F2_B"
+  "F2",
+  "F2i"
 )
 
 HEpiDir.parms.names = c(
@@ -42,11 +41,12 @@ HEpiEnv.parms.names = c(
   "B1P.m",
   "B1P.inter",
   "shed",
-  "corpse.burst"
+  "corpse.burst",
+  "lifespan_P"
 )
 
 Harvest.parms.names = c(
-  "h.loc",
+  "h.permits",
   "h.radius",
   "h.time",
   "h.num"
@@ -60,72 +60,13 @@ Surveil.parms.names = c(
   "sur.start"
 )
 
-SS.parms.names = c("ss.loc", 
-                   "ss.time", 
-                   "ss.radius", 
-                   "ss.eff")
-
-LS.parms.names = c(
-  "thyme",
-  "grid.xmax",
-  "grid.ymax",
-  "cell.x.size",
-  "cell.y.size"
-)
-
-HDemo.parms.names = c(
-  "density",
-  "N0",
-  "K",
-  "fs",
-  "death",
-  "mc_time",
-  "Pbd"
-)
-
-HMove.parms.names = c(
-  "Shift",
-  "inc",
-  "max.den",
-  "move.strat"
-)
-
-HContact.parms.names = c(
-  "F2_int",
-  "F2_B"
-)
-
-HEpiDir.parms.names = c(
-  "B1",
-  "F1"
-)
-
-HEpiEnv.parms.names = c(
-  "B1P.m",
-  "B1P.inter",
-  "shed",
-  "corpse.burst"
-)
-
-Harvest.parms.names = c(
-  "h.loc",
-  "h.radius",
-  "h.time",
-  "h.num"
-)
-
-Surveil.parms.names = c(
-  "test.rate",
-  "true.pos.E",
-  "true.pos.I",
-  "true.neg", 
-  "sur.start"
-)
-
-SS.parms.names = c("ss.loc", 
-                   "ss.time", 
-                   "ss.radius", 
-                   "ss.eff")
+SS.parms.names = c(
+  "ss.time", 
+  "ss.shooters",
+  "ss.radius", 
+  "ss.eff",
+  "ss.strat"
+  )
 
 #####################################################################
 #Meaning
@@ -141,11 +82,10 @@ LS.parms.mean = c(
 
 HDemo.parms.mean = c(
   "number of individuals per unit area",
-  "number of individuals on landscape",
+  "(roughly) the initial number of individuals on landscape",
   "carrying capacity (max number) of individuals",
   "average family size",
-  "death rate of individuals",
-  "mc_time",
+  "lifespan of individiuals",
   "birth rate"
 )
 
@@ -153,16 +93,16 @@ HMove.parms.mean = c(
   "shape and scale of gamma distribution that defines how far individuals relocate on the landscape",
   "homerange size",
   "maximum density per cell",
-  "momenent strategy: do they avoid others or not"
+  "momenent strategy: do they avoid others or not; random, maxden, avoid"
 )
 
 HContact.parms.mean = c(
-  "intercept of glm describing the contact probabilty given distance between individuals",
-  "slope of glm describing the contact probability given distance between individuals"
+  "glm object for fitting direct contact probabilities",
+  "glm object for fitting indirect contact probabilities"
 )
 
 HEpiDir.parms.mean = c(
-  "tranmision probability given contact for individauls in different cells",
+  "transmission probability given contact for individauls in different cells",
   "transmission probability "
 )
 
@@ -170,14 +110,15 @@ HEpiEnv.parms.mean = c(
   "slope of linear portion of logistic function describing the probability of successful transmission given amount of prions in cell",
   "intercept of linear portion of logistic function describing the probability of successful transmission given amount of prions in cell",
   "average number of prions an infectious individuals sheds per timestep (Poisson)",
-  "average number of prions a dead infectious individiual in a single release (Poisson)"
+  "average number of prions a dead infectious individiual in a single release (Poisson)",
+  "lifespan of prions in the environment"
 )
 
 Harvest.parms.mean = c(
-  "grid locations (cell id) that harvesting events occur",
+  "number of permits issued per time step",
   "radius that a harvesting event affects",
-  "time that a harvesting event occurs",
-  "number of individuals that "
+  "times that a harvesting event occurs",
+  "number of individuals removed per permit"
 )
 
 Surveil.parms.mean = c(
@@ -189,11 +130,84 @@ Surveil.parms.mean = c(
 )
 
 SS.parms.mean = c(
-  "grid locations (cell id) that sharpshooting occurs", 
-  "when sharpshooting events occur", 
+  "times when sharpshooting events occur", 
+  "number of shooters that are out per time step",
   "radius that sharpshooting event affects", 
-  "efficiency (proportion of individuals) that sharpshooting removes"
+  "efficiency (proportion of individuals) that sharpshooting removes",
+  "sharpshooting strategy; random: randomly choose where to go shootshoot from surveillance locations, 
+    priority: go to locations that have the highest number of positive detections"
 )
+
+
+###########################################################
+#Values
+###########################################################
+LS.parms.vals = c(
+  thyme,
+  grid.xmax,
+  grid.ymax,
+  cell.x.size,
+  cell.y.size
+)
+
+HDemo.parms.vals = c(
+  density,
+  N0,
+  K,
+  fs,
+  lifespan,
+  Pbd
+)
+
+HMove.parms.vals = c(
+  paste(shift, collapse = " "),
+  inc,
+  max.den,
+  move.strat
+)
+
+HContact.parms.vals = c(
+  "estimated from fake data",
+  "estimated from fake data"
+)
+
+HEpiDir.parms.vals = c(
+  B1,
+  F1
+)
+
+HEpiEnv.parms.vals = c(
+  B1P.m,
+  B1P.inter,
+  shed,
+  corpse.burst, 
+  prion.lifespan
+)
+
+Harvest.parms.vals = c(
+  h.permits,
+  h.radius,
+  paste(h.times, collapse = " "),
+  h.num
+)
+
+Surveil.parms.vals = c(
+  test.rate,
+  true.pos.E,
+  true.pos.I,
+  true.neg, 
+  paste(sur.start, collapse = " ")
+)
+
+SS.parms.vals = c(
+  paste(ss.times, collapse = " "), 
+  ss.shooters,
+  ss.radius, 
+  ss.eff,
+  ss.strat
+)
+
+
 
 ###########################################################
 #Combine them all
@@ -208,4 +222,10 @@ all.parm.mean = c(
   LS.parms.mean, HDemo.parms.mean, HContact.parms.mean, 
   HEpiDir.parms.mean, HEpiEnv.parms.mean, HMove.parms.mean,
   Harvest.parms.mean, Surveil.parms.mean, SS.parms.mean
+)
+
+all.parm.vals = c(
+  LS.parms.vals, HDemo.parms.vals, HContact.parms.vals, 
+  HEpiDir.parms.vals, HEpiEnv.parms.vals, HMove.parms.vals,
+  Harvest.parms.vals, Surveil.parms.vals, SS.parms.vals
 )

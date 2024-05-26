@@ -2,7 +2,7 @@
 StateChangesCWD = function(pop, centroids, cells,
                       Pbd,
                       B1, F1, F2,
-                      B1P.m, B1P.inter,
+                      B1P.m, B1P.inter, F2i,
                       K, death, lat.period, inf.period,
                       Incidence, BB, i, 
                       landscape.prions){
@@ -94,7 +94,7 @@ StateChangesCWD = function(pop, centroids, cells,
   
   Pse = FOICWD(pop, centroids, cells,
                B1, F1, F2,
-               B1P.m, B1P.inter,
+               B1P.m, B1P.inter, F2i,
                landscape.prions) #force of infection #R version
   #Pse is the probability of becoming infected for each S individual in each family; 
   #it is organized as a vector with the the probability of each cell on the landscape

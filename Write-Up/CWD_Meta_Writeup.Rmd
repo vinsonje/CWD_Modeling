@@ -3,6 +3,8 @@ title: "Modeling Chronic Wasting Disease - Metapopulation Model"
 author: "John Vinson"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 ```{r "load packages", echo = FALSE, warning = FALSE}
 library(knitr)
@@ -123,7 +125,7 @@ An susceptible individual can become infected through a contact with an infectio
 
 ###### Environmental (prion) transmission
 
-A susceptible individual can become infected through "contact" with prions on the environment (cells). To determine the probability of this occurring, we need to calculate the probability of contact with prions in a cell given the distance between two cells. Using a glm fitted to indirect contact data (right now using fake data; ) for every cell with prions on them, we determine the probability of contact that individuals in cells on the landscape have with the prions on those prion-infected cells. Since the probability of successful transmissions could be a function of the number of prions on a cell, we assume a logistic relationship between the number of prions in a cell ($P$), and the probability of successful transmission via prions ($p(P)$): 
+A susceptible individual can become infected through "contact" with prions on the environment (cells). To determine the probability of this occurring, we need to calculate the probability of contact with prions in a cell given the distance between two cells. Using a glm fitted to indirect contact data (right now using fake data; **F2_int** and **F2_B**) for every cell with prions on them, we determine the probability of contact that individuals in cells on the landscape have with the prions on those prion-infected cells. Since the probability of successful transmissions could be a function of the number of prions on a cell, we assume a logistic relationship between the number of prions in a cell ($P$), and the probability of successful transmission via prions ($p(P)$): 
 
 $$
 p(P) = \frac{1}{1 + e^{B1P.m P + B1P.inter}}
@@ -156,59 +158,68 @@ When these individuals die due to infection, they are moved to a compartment rep
 
 #### Shedding
 
-Infectious individuals shed prions into the currently occupied cell at an average rate **shed**. To determine how many each individual sheds into their cell, we loop throuhg each infectious individual and drawn the number they shed from a Poisson distribution with mean **shed**. 
+Infectious individuals shed prions into the currently occupied cell at an average rate **shed**. To determine how many each individual sheds into their cell, we loop through each infectious individual and draw the number they shed from a Poisson distribution with mean **shed**. 
 
 #### Corpse burst
 
-Corpses of infectious individuals who die from infection release a large number of prions into the environment. For simplicity, we assume that these corpses only do a single release in the same time step that they died. On average a corpse releases **corpse.burst** prions in the cell they died in. To determine the number each one releases, we go through each corpse on the landscape and the number they release is drawn from a Poisson distribution with mean **corpse.burst**. 
+Corpses of infectious individuals who die from infection release a large number of prions into the environment. For simplicity, we assume that these corpses only do a single release in the same time step that they died. On average a corpse releases **corpse.burst** prions in the cell they died in. To determine the number each one releases, we go through each corpse on the landscape and the number released is drawn from a Poisson distribution with mean **corpse.burst**. 
 
 #### Removal of prions
 
-Prions do not stay in the indefinitely. Currently, each time step, 25% of the prions are removed from each cell on the landscape. 
+Prions do not stay in the environment indefinitely. We roughly describe the dynamics of the prions as:
+
+$$
+\frac{dP}{dt} = sI + bZ - lP
+$$
+
+Here, $s$ represents the shedding rate of infectious individuals, $b$ is the "burst rate" of corpses that died from infection, and l is the loss rate of prions with $\frac{1}{l}$ is the average **lifespan** of prions in the environment. The probability that a prion is "lost" each time step is
+
+$$
+p_{Pl} = 1 - e^{-l} = 1 - e^{-\frac{1}{lifespan}} 
+$$
 
 #### Harvesting
 
-Along with natural, and disease-induced, mortality, individuals on the landscape are at risk of removal via harvesting, or hunting. Prior to running a simulation, we assign time points (**h.time**) and locations (**h.loc**) that harvesting can happen on the landscape. Additionally, the number of individuals at each location (**h.num**) is assigned. At each location, harvesting can affect all the individuals within a radius (**h.radius**) around the cell. To determine which individuals are harvested within the radius, we randomly sample from all individuals. We keep track of individuals who are harvested.
+Along with natural, and disease-induced, mortality, individuals on the landscape are at risk of removal via harvesting, or hunting. Prior to running a simulation, we assign the times (**h.times**) that harvesting can happen on the landscape and number of permits (**h.permits**). This means that in each run a total of $h.times * h.permits$ permits are given out. Additionally, the number individuals that can be removed per permit (**h.num**) is assigned. During a harvesting event (time point), the locations that these events occur are randomly drawn from all cells. At each location, harvesting can affect all the individuals within a radius (**h.radius**) around the cell. To determine which individuals are harvested within the radius, we randomly sample from all individuals in the area. We keep track of individuals who are harvested as these individuals are used in our surveillance method.
 
 #### Surveillance
 
-To determine where to sharpshoot, we use the individuals that are harvested. Prior to starting a simulation, we assign the time that surveillance starts (**sur.start**). Of all the harvested individuals prior to this time point, **test.rate** of the harvested are tested for CWD. When tested, these tests are not perfect and we assign the true positive accuracy, the proportion of E (**true.pos.E**) and I (**true.pos.I**) that are correctly identified as infected, and the true negative accuracy, the proportion of S (**true.neg**) that are correctly identified as not infected. Using these identifications, we then determine where these infected (both correctly and incorrectly identified) are located. 
+To determine where to sharpshoot, we use the individuals that are harvested to see if there are any infected individuals in that area. Prior to starting a simulation, we assign the time(s) that surveillance starts (**sur.start**). Using all the harvested individuals prior to this time point, **test.rate** of the harvested are tested for CWD. When tested, these tests are not perfect and we assign the true positive accuracy, the proportion of E (**true.pos.E**) and I (**true.pos.I**) that are correctly identified as infected, and the true negative accuracy, the proportion of S (**true.neg**) that are correctly identified as not infected. Using these identifications, we then determine where these infected (both correctly, "True Positive", and incorrectly, "False Positive", identified) are located. 
 
 #### Sharpshooting
 
-Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Prior to running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location that it occurs. But, rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**).
+Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Prior to running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location that it occurs. But rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**).
 
 
-### Tracking statistics/measures
+### Tracking statistics/measures, Summarizing dynamics
 
 Rather than keeping track of the entire population as an output, which is very data heavy, we keep track of the quantities of interest that are important for understanding transmission dynamics and the spatial spread of the pathogen. Each time step, we record: 
 
 - the total population size
+- the number of S, E and I each time step
+- the number of cells that have S, E, and I in them
+- location of infected individuals
+- the area that has the infected individuals, maximum distance between two infected individuals, and the number of cells that have infected individuals
 - total number of births
-- location of positive identified individuals
 - the number of new infections, incidence
-- the locations of infected individuals
-- the total number of infected individuals
-- the area that infected individuals occupy on the landscape
-- the max distance between two infected individuals
-- number of cells that have infected individuals in them
-- the locations of cells that prions in them and how many are in each
+- the locations and SEI number of harvested individuals
+- the locations and number of false positive and true negatives (surveillance)
+- the locations and number removed from sharpshooting
+- large dataframe of all population information (not always tracked)
+- the landscape prions dataframe
 
+## Example Dynamics
 
-### Summarizing Dynamics
-
-We need to use the measures that we keep track of each time step to get other outputs to understand transmission. 
-
-Overall, our outputs for each simulation are: 
-
-
+```{r example dynamics gif, echo = FALSE, fig.align = "center", fig.cap = "Fig 3. Example dynamics"}
+include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/Meta_outbreak.gif")
+```
 
 ## Parameters
 
 ```{r "parms table", echo = FALSE}
 source(paste0(getwd(), "/parms_table.R"))
-parm.df = data.frame(parmeter = all.parm.names, meaning = all.parm.mean)
+parm.df = data.frame(parmeter = all.parm.names, meaning = all.parm.mean, value = all.parm.vals)
 
 kable(parm.df, "html") %>%   kable_styling(full_width = F) %>%
-  column_spec(1, width = '1in') %>% column_spec(2, width = '4in')
+  column_spec(1, width = '1in') %>% column_spec(2, width = '4in') %>% column_spec(3, width = '4in')
 ```

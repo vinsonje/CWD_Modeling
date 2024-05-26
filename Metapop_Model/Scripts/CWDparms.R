@@ -3,6 +3,8 @@
 ######################
 thyme = 72
 
+track.pop = TRUE
+
 ###########################
 #grid/landscape parameters
 ###########################
@@ -28,6 +30,8 @@ Pbd = 1.5
 ###########################
 shift = c(1.0, 0.3550) #shape and scale of the gamma distribution that defines how far they relocate on the landscape
 inc = 1.0 #home range size of the population (basically, if they are drawn to relocate lower than this number they don't relocate)
+max.den = 100
+move.strat = "maxden"
 
 ###########################
 #Epidemiological parameters
@@ -79,18 +83,16 @@ F2_B = F2$coef[[2]]
 #############################
 ####Define indirect contacts
 #############################
-n_sim = 10000           # for the initial dataset
+xxi = runif(n_sim)     # predictor values
+coefficientsi = c(0.98, -2.0) # my assumption
+probi = 1/(1 + exp(-(coefficientsi[1] + coefficientsi[2] * xx)))
 
-xx = runif(n_sim)     # predictor values
-coefficients = c(0.98, -2.5) # my assumption
-prob = 1/(1 + exp(-(coefficients[1] + coefficients[2] * xx)))
+yyi = (runif(n_sim) < probi)*1
 
-yy = (runif(n_sim) < prob)*1
+F2i = glm(yyi ~ xxi, family = "binomial")
 
-F2 = glm(yy ~ xx, family = "binomial")
-
-F2_int = F2$coef[[1]]
-F2_B = F2$coef[[2]]
+F2i_int = F2i$coef[[1]]
+F2i_B = F2i$coef[[2]]
 
 
 ######################
@@ -100,7 +102,7 @@ ss.times = c(25, 45)
 ss.shooters = 10
 ss.radius = 5.0
 ss.eff = 0.5
-ss.strat = "random"
+ss.strat = "priority"
 
 ######################
 #Harvesting parameters

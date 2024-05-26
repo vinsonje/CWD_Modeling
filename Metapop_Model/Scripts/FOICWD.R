@@ -1,6 +1,6 @@
 FOICWD = function(pop, centroids, cells,
               B1, F1, F2,
-              B1P.m, B1P.inter,
+              B1P.m, B1P.inter, F2i,
               prions){
   
   #B1 = transmission probability given contact for direct contact (a constant)
@@ -114,7 +114,7 @@ FOICWD = function(pop, centroids, cells,
         pdP[i, , 1] = sqrt((centroids[, 1] - Pmat[i, 1])^2 + (centroids[, 2] - Pmat[i, 2])^2) #this is distance calculation; you had to add an i here not sure if that is needed
         #calculate the probability of the prion coming into contact with deer from all the other cells on the landscape
         #this is from the ("binomial") glm that takes in the distance between the cells and outputs the probability of indirect contact occurring
-        pdP[i, , 2] = predict(F2, newdata = data.frame(xx = pdP[i, , 1]), type = "response")
+        pdP[i, , 2] = exp((predict(F2i, newdata = data.frame(xxi = pdP[i, , 1]))))
       }
     }
     #if there are prions on the landscape

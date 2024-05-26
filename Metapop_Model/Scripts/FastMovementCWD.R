@@ -1,4 +1,4 @@
-FastMovementCWD = function(pop,centroids,shift,inc){
+FastMovementCWD = function(pop, centroids, shift, inc, max.den, move.strat){
 
 #get distances from gamma distribution
 pop[,4] = rgamma(nrow(pop), shape=shift[1], scale=shift[2])
@@ -11,7 +11,7 @@ pop[,7] = pop[,3]
 
 # m1 = parallelMovementRcpp_portion(pop,pop[,1,drop=FALSE],pop[,3,drop=FALSE],centroids,20) #this determines the cell id of where the family moved to. 
 
-m1 = movement_fun(pop,centroids, 10, move.strat = "maxden") #this determines the cell id of where the family moved to. 
+m1 = movement_fun(pop,centroids, max.den, move.strat) #this determines the cell id of where the family moved to. 
 
 pop[,3] = m1 #assign new cell id 
 

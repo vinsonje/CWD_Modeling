@@ -1,6 +1,6 @@
 rm(list = ls())
 gc()
-
+set.seed(101)
 start.time <- Sys.time()
 
 setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Metapop_Model/Scripts") #for my PC
@@ -16,7 +16,7 @@ centroids = init.model[[3]]
 
 onerun = SimulateOneRunCWD(pop, landscape.prions, centroids, track.pop = TRUE)
 
-# plot.landscape.meta(onerun, grid.xmax, grid.ymax)
+plot.landscape.meta(onerun, grid.xmax, grid.ymax, save = TRUE)
 
 
 end.time <- Sys.time()

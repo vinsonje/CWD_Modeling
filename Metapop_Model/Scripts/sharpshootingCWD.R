@@ -102,15 +102,3 @@ sharpshootingCWD = function(pop, centroids, surv.data, ss.shooters, ss.time, ss.
   
   return(list(pop.out, surv.out, SS.out))
 }#end of function
-
-
-# ss.loc = c(11, 265)
-# ss.time = 10
-# ss.radius = 1.0
-# 
-# thyme = 12
-# 
-# test.pop = pop
-# 
-# ss.test = sharpshootingCWD(test.pop, centroids, ss.loc, ss.time, ss.radius, thyme)
-
