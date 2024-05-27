@@ -20,9 +20,9 @@ setwd("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up")
 
 ## Model Overview
 
-We developed a metapopulation model that describes the transmission of chronic wasting disease (CWD) on a landscape. The model tracks families (groups) of individuals including the number of susceptible (S), exposed (E), and infectious individuals in each family. We assume that families can relocate on the landscape but individuals can move (implicitly, i.e. we do not directly track their movements) to have both direct and indirect contacts (prions) with individuals in other locations on the landscape. Susceptible individuals can become infected via direct contacts with infectious individuals after which they transition to exposed. Exposed individuals become infectious, whereby they begin shedding prions into the environment (their current location/cell). Infectious individuals that die, not via hunting or sharpshooting), can quickly release a large number of prions through their corpse. These prions persist in the environment and susceptible individuals that come into contact them can become infected (transition to exposed). 
+We developed a metapopulation model that describes the transmission of chronic wasting disease (CWD) on a landscape. The model tracks families (groups) of individuals, including the number of susceptible (S), exposed (E), and infectious (I) individuals in each family. We assume that families can relocate on the landscape but individuals can move (implicitly, i.e. we do not directly track their movements) to have both direct and indirect contacts (prions) with individuals in other families and locations on the landscape. Susceptible individuals can become infected via direct contacts with infectious individuals after which they transition to exposed. Exposed individuals become infectious, whereby they begin shedding prions into the environment (their current location/cell). Infectious individuals that die, not via hunting or sharpshooting), can quickly release a large number of prions through their corpse. These prions persist in the environment and susceptible individuals that come into contact with them can become infected (transition to exposed). 
 
-Births result in new susceptible individuals, and all individuals can die through natural mortality. All individuals can be harvested (die) via hunting. Harvested individuals can be sent to testing to determine infection status. The positive identifications are used to determine where sharp shooting (culling events) occur on the landscape. 
+Births result in new susceptible individuals, and all individuals can die through natural mortality. All individuals can be harvested (die) via hunting. Harvested individuals can be sent for testing to determine infection status. Positive identifications are used to determine where sharp shooting (culling events) occur on the landscape. 
 
 ```{r compartment image, echo = FALSE, fig.align = "center", fig.cap = "Fig 1. Simple diagram of CWD transmission in model"}
 include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/CWD Compartment Diagram.jpg")
@@ -30,7 +30,7 @@ include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/CWD
 
 ## Process
 
-We can break down our simulation algorithm into distinct processes involving initialization of the simulation, simulating a single run, and generating outputs.
+We can break down our simulation algorithm into distinct processes involving initialization of the simulation, simulating a single run, and generating outputs/summaries.
 
 ### Initialize
 
@@ -73,7 +73,7 @@ Once everything is initialized, the simulation will repeat until the **thyme**, 
 
 #### Relocate families (movement)
 
-Families can relocate to a new cell. For each family on the landscape, the distance that they "relocate" is sampled from a gamma distribution (shape and scale from **shift**). If the distance they relocate is less than their homerange size, **inc**, then the family does not move. If it is greater and they do relocate, they are able to move to cell that withing the range of the sampled distance (excluding the cell they care currently in). There are three strategies, **move.strat**, that they could follow: "random" (individuals move to a random cell withing their range), "avoid" (families move to cells that are least occupied/have the lowest density), and "**max.den**" (there is a maximum threshold density and families cannot move to cells that meet or have exceeded that density).
+Families can relocate to a new cell. For each family on the landscape, the distance that they "relocate" is sampled from a gamma distribution (shape and scale from **shift**). If the distance they relocate is less than their home range size, **inc**, then the family does not move. If it is greater and they do relocate, they are able to move to cell within the range of the sampled distance (excluding the cell they care currently in). There are three movements strategies in deciding where to move, **move.strat**: "random" (individuals move to a random cell withing their range), "avoid" (families move to cells that are least occupied/have the lowest density), and "**max.den**" (there is a maximum threshold density and families cannot move to cells that meet or have exceeded that density).
 
 #### State changes
 
@@ -88,18 +88,18 @@ $$
 $$
 Here, **K** is the maximum number of individuals that can be supported on the landscape (carrying capacity), b is the birth rate, and d is the death rate. 
 
-To simulate birth events, we calculate the density-dependent births (DDB; $b N (1 - \frac{N}{K})$) using **Pbd** as the birth rate, $b$. Because there could be instances where the population is above K, we set the DDB to have a minimum of 0, meaning the DDBR is 0 when the population is at or above K. We then sample the number of new individuals (i.e. the number of births) from a Poisson distribution with a mean of DDB. Because these individuals need to be distributed across all families, we separate these new individuals into subgroups that sum to the total number of new individuals. To control the births so that one cell does not result in the majority of births, we set a maximum number of new individuals per group to 10. We determine which cells are assigned these groups.   
+To simulate birth events, we calculate the density-dependent births (DDB; $b N (1 - \frac{N}{K})$) using **Pbd** as the birth rate, $b$. Because there could be instances where the population is above K, we set the DDB to have a minimum of 0, meaning the DDBR is 0 when the population is at or above K. We then sample the number of new individuals (i.e. the number of births) from a Poisson distribution with a mean of DDB. Because these individuals need to be distributed across all families, we separate these new individuals into subgroups that sum to the total number of new individuals. To control the births (e.g. so that one cell does not result in the majority of births), we set a maximum number of new individuals per group to 10. We determine which cells are assigned these groups.   
 
 
 ##### Natural deaths
 
-To simulate natural death events, we calculate the probability of natural mortality using the *lifespan* parameter: 
+To simulate natural death events, we calculate the probability of natural mortality using the *lifespan* parameter, the average time an individual lives before it dies of natural causes: 
 
 $$
 p(lifespan) = 1 - e^{-\frac{1}{lifespan}}
 $$
 
-Using this probability ($p(d)$), we go through *each live* individual in the population and determine if they die from natural causes. 
+Using this probability ($p(d)$), we go through *each live* individual (all S, E, and I) in the population and determine if they die from natural causes (random sample from a Binomial distribution with success probability $p(d)$). Infectious individuals who die are moved to a compartment representing infectious corpses as they can release prions into the environment (corpse burst).
 
 ##### Transitions
 
@@ -115,43 +115,43 @@ $$
 p(\lambda) = 1 - e^{-\lambda}
 $$
 
-The force of infection can be broken down into three components: the contact rate between individuals, probability that the contact is with an infected individual, and the probability of successful transmission given a contact. Here, we will simplify this as we can calculate the probability of contact with an infected individual and provide the probability of transmission given contact. 
+Traditionally, the force of infection can be broken down into three components: the contact rate between individuals, the probability that the contact is with an infected individual, and the probability of successful transmission given a contact. Here, we will simplify this as we can calculate the probability of contact with an infected individual and provide the probability of transmission given contact. 
 
 As there are two ways that individuals can become infected, we need to calculate them separately. Also, because location contributes to contact probabilities (and rates) each cell should have a unique force of infection. 
 
 ###### Direct Transmission
 
-An susceptible individual can become infected through a contact with an infectious individual. To determine this probability of this occurring, we need to calculate the probability of contact given the distance between two cells. Using a glm fitted to direct contact data (right now I'm using fake data; **F2_int** and **F2_B**), for every cell with infectious (I) individuals, we determine the probability of contact the individuals in those cells have with all other cells in the landscape. We then multiply each probability of contact with the probability of successful direct transmission (**B1**).  We assumed that within cell transmission may have a different probability of transmission (**F1**). These are then summed for each cell on the landscape, to get the cumulative force of infection exerted on each cell on the landscape from all "infected" cells ($B_{D}$).
+A susceptible individual can become infected through a contact with an infectious individual. To determine the probability of this occurring, we need to calculate the probability of contact given the distance between two cells. Using a glm fitted to direct contact data (right now I'm using fake data; **F2**), for every cell with infectious (I) individuals, we determine the probability of contact the individuals in those cells have with all other cells in the landscape. We then multiply each probability of contact by the probability of successful direct transmission (**B1**).  We assumed that within-cell transmission may have a different probability of transmission (**F1**). These are then summed for each cell on the landscape, to get the cumulative force of infection exerted on each cell on the landscape from all cells with infectious individuals ($B_{D}$).
 
 ###### Environmental (prion) transmission
 
-A susceptible individual can become infected through "contact" with prions on the environment (cells). To determine the probability of this occurring, we need to calculate the probability of contact with prions in a cell given the distance between two cells. Using a glm fitted to indirect contact data (right now using fake data; **F2_int** and **F2_B**) for every cell with prions on them, we determine the probability of contact that individuals in cells on the landscape have with the prions on those prion-infected cells. Since the probability of successful transmissions could be a function of the number of prions on a cell, we assume a logistic relationship between the number of prions in a cell ($P$), and the probability of successful transmission via prions ($p(P)$): 
+A susceptible individual can become infected through "contact" with prions on the environment (cells). To determine the probability of this occurring, we need to calculate the probability of contact with prions in a cell given the distance between two cells. Using a glm fitted to indirect contact data (right now using fake data; **F2i**) for every cell with prions on them, we determine the probability of contact that individuals in cells on the landscape have with the prions on those prion-infected cells. Since the probability of successful transmissions could be a function of the number of prions on a cell, we assume a logistic relationship between the number of prions in a cell ($P$), and the probability of successful transmission via prions ($p(P)$): 
 
 $$
 p(P) = \frac{1}{1 + e^{B1P.m P + B1P.inter}}
 $$
 
-Here, **B1P.m** controls how quickly the probability switches from ~0 to ~1.0 and **B1P.inter** controls where at what value of P the switch occurs. We multiply the indirect contact probability with the probability of successful prion transmission. These are summed for each cell on the landscape to get the cumulative force of infection exerted by prion infected cells on each cell the landscape ($B_{P}$). 
+Here, **B1P.m** controls how quickly the probability switches from ~0 to ~1.0 and **B1P.inter** controls where at what value of P the switch occurs. We multiply the indirect contact probability by the probability of successful prion transmission. These are summed for each cell on the landscape to get the cumulative force of infection exerted by prion infected cells on each cell the landscape ($B_{P}$). 
 
 
-To get the total force of infection/transmission ($\lambda$), we need to sum the transmission from direct and environmental (prions). Using the probability of infection ($p(\lambda)$) for each cell on the landscape, we got through each susceptible individual to determine if they become infected. 
+To get the total force of infection/transmission ($\lambda$), we need to sum the transmission from direct ($B_{D}$) and environmental (prions) ($B_{P}$), $\lambda = B_{D} +B_{P}$. Using the probability of infection ($p(\lambda)$) for each cell on the landscape, we got through each susceptible individual to determine if they become infected. 
 
 ##### Latent period (E -> I)
 
-Individuals who become infected transition to the exposed class, where they are infected but are not capable of transmitting the parasite or shed prions into the environment, yet. On average, individuals become infectious **latent.period** time units after becoming infected. The probability that an exposed individual becomes infectious is:
+Individuals who become infected transition to the exposed (E) class, where they are infected but are not capable of transmitting the parasite or shed prions into the environment, yet. On average, individuals become infectious **latent.period** time units after becoming infected. The probability that an exposed individual becomes infectious, at each time step, is:
 
 $$
 p_{EI} = 1 - e^{-\frac{1}{latent.period}}
 $$
 
-We go through each exposed individual and determine if they transition to infectious. 
+At each time step, we go through each exposed individual and determine if they transition to infectious. 
 
-##### Disease induced mortality (I -> Dead)
+##### Disease-induced mortality (I -> Dead,Z)
 
-Along with dying due to natural causes, infectious individuals (I) can die through infection. On average, infectious individuals die due to infection after **infectious.period** time units. The probability that an infectious individual dies due to infection is:
+Along with dying due to natural causes, infectious individuals (I) can die through infection. On average, infectious individuals die due to infection after **inf.period** time units. The probability that an infectious individual dies due to infection is:
 
 $$
-p_{EI} = 1 - e^{-\frac{1}{latent.period}}
+p_{IZ} = 1 - e^{-\frac{1}{inf.period}}
 $$
 
 When these individuals die due to infection, they are moved to a compartment representing infectious corpses. These are kept track of as they lead to a burst of prions into the cell they die in (corpse burst).
@@ -162,7 +162,7 @@ Infectious individuals shed prions into the currently occupied cell at an averag
 
 #### Corpse burst
 
-Corpses of infectious individuals who die from infection release a large number of prions into the environment. For simplicity, we assume that these corpses only do a single release in the same time step that they died. On average a corpse releases **corpse.burst** prions in the cell they died in. To determine the number each one releases, we go through each corpse on the landscape and the number released is drawn from a Poisson distribution with mean **corpse.burst**. 
+Corpses of infectious individuals who die from natural causes or infection release a large number of prions into the environment. For simplicity, we assume that these corpses only do a single release in the same time step that they died. On average a corpse releases **corpse.burst** prions in the cell they died in. To determine the number each one releases, we go through each corpse on the landscape and the number released is drawn from a Poisson distribution with mean **corpse.burst**. 
 
 #### Removal of prions
 
@@ -172,15 +172,15 @@ $$
 \frac{dP}{dt} = sI + bZ - lP
 $$
 
-Here, $s$ represents the shedding rate of infectious individuals, $b$ is the "burst rate" of corpses that died from infection, and l is the loss rate of prions with $\frac{1}{l}$ is the average **lifespan** of prions in the environment. The probability that a prion is "lost" each time step is
+Here, $s$ represents the shedding rate of infectious individuals, $b$ is the "burst rate" of corpses that died from infection, and l is the loss rate of prions with $\frac{1}{l}$ is the average **lifespan_P** of prions in the environment. The probability that a prion is "lost" each time step is
 
 $$
-p_{Pl} = 1 - e^{-l} = 1 - e^{-\frac{1}{lifespan}} 
+p_{Pl} = 1 - e^{-l} = 1 - e^{-\frac{1}{lifespan_P}} 
 $$
 
 #### Harvesting
 
-Along with natural, and disease-induced, mortality, individuals on the landscape are at risk of removal via harvesting, or hunting. Prior to running a simulation, we assign the times (**h.times**) that harvesting can happen on the landscape and number of permits (**h.permits**). This means that in each run a total of $h.times * h.permits$ permits are given out. Additionally, the number individuals that can be removed per permit (**h.num**) is assigned. During a harvesting event (time point), the locations that these events occur are randomly drawn from all cells. At each location, harvesting can affect all the individuals within a radius (**h.radius**) around the cell. To determine which individuals are harvested within the radius, we randomly sample from all individuals in the area. We keep track of individuals who are harvested as these individuals are used in our surveillance method.
+Along with natural, and disease-induced, mortality, individuals on the landscape are at risk of removal via harvesting, or hunting. Prior to running a simulation, we assign the times (**h.times**) that harvesting can happen on the landscape and number of permits (**h.permits**). This means that in each run a total of $h.times * h.permits$ permits are given out. Additionally, the number of individuals that can be removed per permit (**h.num**) is assigned. During a harvesting event (time point), the locations where events occur are randomly drawn from all cells. At each location, harvesting can affect all the individuals within a radius (**h.radius**) around the cell. To determine which individuals are harvested within the radius, we randomly sample from all individuals in the area. We keep track of individuals who are harvested as these individuals are used in our surveillance method.
 
 #### Surveillance
 
@@ -188,12 +188,12 @@ To determine where to sharpshoot, we use the individuals that are harvested to s
 
 #### Sharpshooting
 
-Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Prior to running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location that it occurs. But rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**).
+Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Before running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location where it occurs. But rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**). We also assign a strategy (**ss.strat**) for sharpshooting: **random** (randomly choose where to go shootshoot for surveillance), **priority** (go to locations that have the highest number of positive identifications).
 
 
 ### Tracking statistics/measures, Summarizing dynamics
 
-Rather than keeping track of the entire population as an output, which is very data heavy, we keep track of the quantities of interest that are important for understanding transmission dynamics and the spatial spread of the pathogen. Each time step, we record: 
+Rather than always keeping track of the entire population as an output, which is very data heavy, we keep track of the quantities of interest that are important for understanding transmission dynamics and the spatial spread of the pathogen. Each time step, we record: 
 
 - the total population size
 - the number of S, E and I each time step
@@ -210,7 +210,7 @@ Rather than keeping track of the entire population as an output, which is very d
 
 ## Example Dynamics
 
-```{r example dynamics gif, echo = FALSE, fig.align = "center", fig.cap = "Fig 3. Example dynamics"}
+```{r example dynamics gif, echo = FALSE, fig.align = "center", fig.cap = "Fig 3. Example dynamics using parameters in Table 1."}
 include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/Meta_outbreak.gif")
 ```
 
@@ -220,6 +220,6 @@ include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/Met
 source(paste0(getwd(), "/parms_table.R"))
 parm.df = data.frame(parmeter = all.parm.names, meaning = all.parm.mean, value = all.parm.vals)
 
-kable(parm.df, "html") %>%   kable_styling(full_width = F) %>%
+kable(parm.df, "html", caption = "Table 1. Table of parameters, meaning and values to generate the example dynamics.") %>%   kable_styling(full_width = F) %>%
   column_spec(1, width = '1in') %>% column_spec(2, width = '4in') %>% column_spec(3, width = '4in')
 ```

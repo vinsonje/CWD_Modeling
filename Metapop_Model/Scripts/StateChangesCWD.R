@@ -145,7 +145,7 @@ StateChangesCWD = function(pop, centroids, cells,
   pop[, 8] = pop[, 8] - Eep + Sdpb - Sdpd #Snew = Sold - S->E + births - deaths
   pop[, 9] = pop[, 9] - Iep + Eep - Edpd #Enew = Eold - E->I + S->E - deaths
   pop[, 10] = pop[, 10] - Zdpd + Iep - Idpd #Inew = Iold - death via inf. + E->I - deaths
-  pop[, 11] = pop[, 11] + Zdpd  #Znew = Zold + I deaths
+  pop[, 11] = pop[, 11] + Zdpd + Idpd  #Znew = Zold + I deaths
   #this last one I think I should just have as the new dead from infection to do the corpse prion burst. 
   
   #sometimes end up with negative numbers 
