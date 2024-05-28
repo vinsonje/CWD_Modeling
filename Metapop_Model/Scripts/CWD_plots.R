@@ -37,7 +37,7 @@ plot.landscape.meta = function(sim_output, grid.xmax, grid.ymax, gif.time=21, gi
   p.inf = ggplot() + geom_tile(data = I.loc.df.final, aes(x = x.loc, y = y.loc, fill = num)) +
     geom_point(data = sim_output[[15]], aes(x = x.now, y = y.now, color = as.factor(fam.id))) +
     theme_cowplot() + scale_fill_gradient(low = "white", high = "blue") + xlim(0, grid.xmax) + ylim(0, grid.ymax) + 
-    scale_color_manual(values = rep("black", 200), guide = "none")
+    scale_color_manual(values = rep("black", max(onerun[[15]]$fam.id)+1), guide = "none")
 
   #Infection Abundance
   I.time = data.frame(time = 1:length(sim_output[[4]]), I = sim_output[[4]])

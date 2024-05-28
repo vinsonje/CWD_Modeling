@@ -128,7 +128,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       
       surv.yearly = rbind(surv.yearly, surv.event.out[[1]])
       harvest.yearly = surv.event.out[[2]]
-      surv.out = rbind(surv.out, surv.event.out[[1]])
+      if(is.null(surv.event.out[[1]]) == FALSE){surv.out = rbind(surv.out, cbind(surv.event.out[[1]], time = i))}
     
       ###############################
       #### Sharpshooting ############
@@ -163,6 +163,8 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
       landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
       
+      
+      print(summary.pop[[6]])
     }else{print("Exiting loop, no infections")} #if any infected closing bracket/else
     
   } #for timestep closing bracket

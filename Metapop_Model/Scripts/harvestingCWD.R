@@ -12,15 +12,12 @@
 #thyme = the current time of the simulation
 #########################################
 
-#I need to save the individuals and their information to be used in a surveillance
-
 harvestingCWD = function(pop, centroids, h.permits, h.time, h.radius, h.num, thyme){
   
   pop.out = pop
   harvest.out = matrix(c(0, 0, 0, 0, 0), nrow = 1)
 
   if(thyme %in% h.time){
-    print("starting harvest")
     h.loc = sample(dim(centroids)[1], h.permits, replace = TRUE)
     
     for(q in 1:length(h.loc)){
@@ -80,11 +77,11 @@ harvestingCWD = function(pop, centroids, h.permits, h.time, h.radius, h.num, thy
         
         loc = pop[fams.rem.index[f], 3]
         
-        if(loc %in% S.rem.ct$S.rem.loc){S.rem = S.rem.ct$Freq[which(S.rem.ct$S.rem.loc==loc)]}
+        if(dim(S.rem.ct)[1]>0){if(loc %in% S.rem.ct$S.rem.loc){S.rem = S.rem.ct$Freq[which(S.rem.ct$S.rem.loc==loc)]}}
         
-        if(loc %in% E.rem.ct$E.rem.loc){E.rem = E.rem.ct$Freq[which(E.rem.ct$E.rem.loc==loc)]}
+        if(dim(E.rem.ct)[1]>0){if(loc %in% E.rem.ct$E.rem.loc){E.rem = E.rem.ct$Freq[which(E.rem.ct$E.rem.loc==loc)]}}
         
-        if(loc %in% I.rem.ct$I.rem.loc){I.rem = I.rem.ct$Freq[which(I.rem.ct$I.rem.loc==loc)]}
+        if(dim(I.rem.ct)[1]>0){if(loc %in% I.rem.ct$I.rem.loc){I.rem = I.rem.ct$Freq[which(I.rem.ct$I.rem.loc==loc)]}}
         
         pop.out[fams.rem.index[f], 8] = pop.out[fams.rem.index[f], 8] - S.rem
         pop.out[fams.rem.index[f], 9] = pop.out[fams.rem.index[f], 9] - E.rem

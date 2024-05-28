@@ -1,15 +1,15 @@
 ######################
 ####Define Parameters
 ######################
-thyme = 72
+thyme = 12*6
 
 track.pop = TRUE
 
 ###########################
 #grid/landscape parameters
 ###########################
-grid.xmax = 20
-grid.ymax = 20
+grid.xmax = 100
+grid.ymax = 100
 cell.x.size = 1.0
 cell.y.size = 1.0
 density = 5 #density per X
@@ -69,7 +69,7 @@ prion.lifespan = 20
 ############################
 n_sim = 10000           # for the initial dataset
 
-xx = runif(n_sim)     # predictor values
+xx = runif(n_sim)*grid.xmax     # predictor values
 coefficients = c(0.98, -1.9128) # my assumption
 prob = 1/(1 + exp(-(coefficients[1] + coefficients[2] * xx)))
 
@@ -83,9 +83,9 @@ F2_B = F2$coef[[2]]
 #############################
 ####Define indirect contacts
 #############################
-xxi = runif(n_sim)     # predictor values
+xxi = runif(n_sim)*grid.xmax     # predictor values
 coefficientsi = c(0.98, -2.0) # my assumption
-probi = 1/(1 + exp(-(coefficientsi[1] + coefficientsi[2] * xx)))
+probi = 1/(1 + exp(-(coefficientsi[1] + coefficientsi[2] * xxi)))
 
 yyi = (runif(n_sim) < probi)*1
 

@@ -9,7 +9,7 @@ summarizeCWD = function(pop, track.pop = FALSE, thyme){
   Isums.temp = sum(pop[, 10])
   
   #####################################
-  ######## Track SEI numbers  ######### 
+  ######## Track SEI families  ######## 
   #####################################
   
   if(nrow(pop[pop[, 8] > 0, ,drop = FALSE]) > 0){

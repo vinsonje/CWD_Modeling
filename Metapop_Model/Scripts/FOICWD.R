@@ -42,7 +42,6 @@ FOICWD = function(pop, centroids, cells,
         #the distance from the infected cell ("dist") 
         #the probability that the deers from the respective cells have a direct contact ("prob")
       pdI = array(0, dim = c(num_I, cells, 2), dimnames = list(paste0("I_", 1:num_I), paste0("cell_", 1:cells), c("dist","prob")))
-      
       #to replace all the 0's in the array, we need to loop through each infected cell (array[i,,])
       for(i in 1:nrow(Imat)){
         # print(paste("calculating I distances ", i, " in ", nrow(Imat)))
@@ -50,7 +49,7 @@ FOICWD = function(pop, centroids, cells,
         pdI[i, , 1] = sqrt((centroids[, 1] - Imat[i, 5])^2 + (centroids[, 2] - Imat[i, 6])^2) 
         #calculate the probability of the infected deer coming into contact with all the other cells on the landscape
         #this is from the ("binomial") glm that takes in the distance between the cells and outputs the probability of contact occurring
-        pdI[i, , 2] = exp(predict(F2, newdata = data.frame(xx = pdI[i, , 1])))
+        pdI[i, , 2] = predict(F2, newdata = data.frame(xx = pdI[i, , 1]), type = "response")
       } #end of for loop
     } #end of if statement
     
@@ -106,7 +105,6 @@ FOICWD = function(pop, centroids, cells,
       #right now this will come from the same glm for direct contacts
       #I think it will need to be something with a homerange overlap analysis
       pdP = array(0, dim = c(num_P_cells,cells,2), dimnames = list(paste0("P_", 1:num_P_cells), paste0("cell_", 1:cells), c("dist","prob")))
-      
       #to replace all the 0's in the array, we need to loop through each prion cell (array[i,,])
       for(i in 1:nrow(Pmat)){
         # print(paste("calculating P distances ", i, " in ", nrow(Pmat)))
@@ -114,7 +112,7 @@ FOICWD = function(pop, centroids, cells,
         pdP[i, , 1] = sqrt((centroids[, 1] - Pmat[i, 1])^2 + (centroids[, 2] - Pmat[i, 2])^2) #this is distance calculation; you had to add an i here not sure if that is needed
         #calculate the probability of the prion coming into contact with deer from all the other cells on the landscape
         #this is from the ("binomial") glm that takes in the distance between the cells and outputs the probability of indirect contact occurring
-        pdP[i, , 2] = exp((predict(F2i, newdata = data.frame(xxi = pdP[i, , 1]))))
+        pdP[i, , 2] = predict(F2i, newdata = data.frame(xxi = pdP[i, , 1]), type = "response")
       }
     }
     #if there are prions on the landscape

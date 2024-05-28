@@ -91,7 +91,6 @@ StateChangesCWD = function(pop, centroids, cells,
   ##############################################################
   ######## Determine disease state change probabilities ######## 
   ##############################################################
-  
   Pse = FOICWD(pop, centroids, cells,
                B1, F1, F2,
                B1P.m, B1P.inter, F2i,

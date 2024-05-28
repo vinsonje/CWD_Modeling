@@ -121,7 +121,7 @@ As there are two ways that individuals can become infected, we need to calculate
 
 ###### Direct Transmission
 
-A susceptible individual can become infected through a contact with an infectious individual. To determine the probability of this occurring, we need to calculate the probability of contact given the distance between two cells. Using a glm fitted to direct contact data (right now I'm using fake data; **F2**), for every cell with infectious (I) individuals, we determine the probability of contact the individuals in those cells have with all other cells in the landscape. We then multiply each probability of contact by the probability of successful direct transmission (**B1**).  We assumed that within-cell transmission may have a different probability of transmission (**F1**). These are then summed for each cell on the landscape, to get the cumulative force of infection exerted on each cell on the landscape from all cells with infectious individuals ($B_{D}$).
+A susceptible individual can become infected through a contact with an infectious individual. To determine the probability of this occurring, we need to calculate the probability of contact given the distance between two cells. Using a glm fitted to direct contact data (right now I'm using fake data; **F2**), for every family with infectious (I) individuals, we determine the probability of contact the individuals in those cells with infected families have with all other cells in the landscape. We then multiply each probability of contact by the probability of successful direct transmission (**B1**).  We assumed that within-cell transmission may have a different probability of transmission (**F1**). These are then summed for each cell on the landscape, to get the cumulative force of infection exerted on each cell on the landscape from all cells with infectious individuals ($B_{D}$).
 
 ###### Environmental (prion) transmission
 
@@ -197,7 +197,7 @@ Rather than always keeping track of the entire population as an output, which is
 
 - the total population size
 - the number of S, E and I each time step
-- the number of cells that have S, E, and I in them
+- the number of families that have S, E, and I in them
 - location of infected individuals
 - the area that has the infected individuals, maximum distance between two infected individuals, and the number of cells that have infected individuals
 - total number of births
