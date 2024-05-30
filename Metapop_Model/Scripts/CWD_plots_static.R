@@ -1,5 +1,5 @@
 #################################
-#CWD staic plots
+#CWD static plots
 #################################
 
 CWD.plots.static = function(sim_output, grid.xmax, grid.ymax, thyme){
@@ -11,6 +11,12 @@ CWD.plots.static = function(sim_output, grid.xmax, grid.ymax, thyme){
     geom_line(aes(x = 1:thyme, sim_output[[3]]/sim_output[[1]]), color = "darkgreen", lwd = 2.0) +
     geom_line(aes(x = 1:thyme, sim_output[[4]]/sim_output[[1]]), color = "firebrick", lwd = 2.0) +
     theme_cowplot() + xlab("time") + ylab("proportion of population")
+  
+  SEI.num.plot = ggplot() + geom_line(aes(x = 1:thyme, sim_output[[2]]), color = "black", lwd = 2.0) +
+    geom_line(aes(x = 1:thyme, sim_output[[3]]), color = "darkgreen", lwd = 2.0) +
+    geom_line(aes(x = 1:thyme, sim_output[[4]]), color = "firebrick", lwd = 2.0) +
+    theme_cowplot() + xlab("time") + ylab("proportion of population")
+  
   
   spread.plot = ggplot() + geom_line(aes(x = 1:thyme, sim_output[[9]][,1]), color = "black", lwd = 2.0) + 
     theme_cowplot() + xlab("time") + ylab("spread (KM)")
@@ -51,10 +57,10 @@ CWD.plots.static = function(sim_output, grid.xmax, grid.ymax, thyme){
   p.list = list(N.plot, SEI.plot,
                spread.plot, incidence.plot,
                harvest.plot, surv.plot,
-               ss.plot)
+               ss.plot, SEI.num.plot)
   
   grid.arrange(N.plot, SEI.plot, ncol = 2, nrow = 1)
   grid.arrange(spread.plot, incidence.plot, ncol = 2, nrow = 1)
   grid.arrange(harvest.plot, surv.plot, ncol = 2, nrow = 1)
-  grid.arrange(ss.plot, ncol = 2, nrow = 1)
+  grid.arrange(ss.plot, SEI.num.plot, ncol = 2, nrow = 1)
 }

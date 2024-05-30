@@ -13,6 +13,7 @@ InitializeFamilies <- function(N0, fs, cells, centroids, type, init_locs){
   if(type==0){
     
     fn_i = N0/fs #Get the initializing number of families
+    if(fn_i > cells){fn_i = cells} #if there are more families than cells, need to constrain to only have any many families as cells
     assigns = rbinom(cells, 1, fn_i/cells) #randomly assign families to cells
     fn = sum(assigns) #generated pop size from random assignment of families to cells
     init_locs = which(assigns == 1) #get the locations where families have been initialized

@@ -63,8 +63,8 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
   
   #start the timestep loop
   for(i in 1:thyme){
-    if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
-    # if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999)){
+    # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
+    if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999|pop[, 8, drop=FALSE]>-999)){
         
       print(i)
   
@@ -74,18 +74,25 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       print("starting movement")
       pop = FastMovementCWD(pop, centroids, shift, inc, max.den, move.strat)
       
+      ##########################
+      ##### Dispersal ##########
+      ##########################
+      print("starting dispersal")
+      pop = dispersalCWD(pop, dispersal, disp.dist, disp.times, i)
+
       ###############################
       ######## State Changes ######## 
       ###############################
       print("starting state changes")
       #births, natural deaths, disease state changes (exposure, infection, recovery, death), carcass decay
       st.list = StateChangesCWD(pop, centroids, cells,
-                                Pbd,
+                                Pbd, birth.times,
                                 B1, F1, F2,
                                 B1P.m, B1P.inter, F2i,
                                 K, lifespan, lat.period, inf.period,
                                 Incidence, BB, i, 
-                                landscape.prions) 
+                                landscape.prions,
+                                i) 
       pop = st.list[[1]]
       Incidence = st.list[[2]]
       BB = st.list[[3]]
@@ -119,7 +126,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       pop = harvest.event.out[[1]]
       harvest.out = rbind(harvest.out, harvest.event.out[[2]])
       harvest.yearly = rbind(harvest.yearly, harvest.event.out[[2]])
-
+      
       ##############################
       ######### Surveillance #######
       ##############################

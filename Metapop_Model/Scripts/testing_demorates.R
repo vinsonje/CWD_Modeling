@@ -32,3 +32,4 @@ w.prop[,k] = out.prop[,k]*k
 mean.time = rowSums(w.prop)
 
 hist(mean.time)
+mean(mean.time)

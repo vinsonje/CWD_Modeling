@@ -1,11 +1,12 @@
 #outputs: pop,Incidence,BB
 StateChangesCWD = function(pop, centroids, cells,
-                      Pbd,
+                      Pbd, birth.times,
                       B1, F1, F2,
                       B1P.m, B1P.inter, F2i,
                       K, death, lat.period, inf.period,
                       Incidence, BB, i, 
-                      landscape.prions){
+                      landscape.prions,
+                      thyme){
   ####################################################################
   ########### Initialize state change probability matrices ########### 
   ####################################################################
@@ -40,7 +41,7 @@ StateChangesCWD = function(pop, centroids, cells,
   ########################################
   ########### Determine Births ########### 
   ########################################
-  
+  if(thyme %in% birth.times){
   #subset family sets with live individuals
   # idN = pop[pop[, 8, drop = FALSE] > 0 | pop[, 9, drop = FALSE] > 0 | pop[, 10, drop=FALSE] > 0 | pop[, 11, drop=FALSE] > 0, ]
   
@@ -55,6 +56,7 @@ StateChangesCWD = function(pop, centroids, cells,
   
   #get total births, using Brate as mean in a poisson
   Tbirths = rpois(1, Brate)
+  }else{Tbirths = 0}
   
   #record total births this time step
   BB[i] = Tbirths

@@ -103,7 +103,7 @@ HContact.parms.mean = c(
 
 HEpiDir.parms.mean = c(
   "transmission probability given contact for individauls in different cells",
-  "transmission probability "
+  "transmission probability given contact within same cell"
 )
 
 HEpiEnv.parms.mean = c(
