@@ -83,7 +83,7 @@ $$
 p(dispersal.rate) = 1 - e^{-dispersal.rate}
 $$
 
-When an individual disperses, the distance they can disperse is drawn from a gamma distribution with shape and scale parameters, **disp.dist**. If there are no families within range, they do not relocate and stay within their current location and family. The location and family that the individual relocates to is randomly drawn from all possible family locations, including the current family that it is in. 
+When an individual disperses, the distance they can disperse is drawn from a gamma distribution with shape and scale parameters, **disp.dist**. If there are no families within range, they do not relocate and stay within their current location and family. The location and family that the individual relocates to is randomly drawn from all possible family locations, excluding the current family that it is in. 
 
 #### State changes
 
