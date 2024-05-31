@@ -17,14 +17,18 @@ HDemo.parms.names = c(
   "K",
   "fs",
   "lifespan",
-  "Pbd"
+  "Pbd",
+  "birth.times"
 )
 
 HMove.parms.names = c(
   "Shift",
   "inc",
   "max.den",
-  "move.strat"
+  "move.strat",
+  "dispersal",
+  "disp.dist",
+  "disp.times"
 )
 
 HContact.parms.names = c(
@@ -86,14 +90,18 @@ HDemo.parms.mean = c(
   "carrying capacity (max number) of individuals",
   "average family size",
   "lifespan of individiuals",
-  "birth rate"
+  "birth rate", 
+  "time that births happen"
 )
 
 HMove.parms.mean = c(
   "shape and scale of gamma distribution that defines how far individuals relocate on the landscape",
   "homerange size",
   "maximum density per cell",
-  "momenent strategy: do they avoid others or not; random, maxden, avoid"
+  "momenent strategy: do they avoid others or not; random, maxden, avoid",
+  "dispersal rate",
+  "shape and scale for gamma distribution for dispersal distance",
+  "times that dispersal happens"
 )
 
 HContact.parms.mean = c(
@@ -156,14 +164,18 @@ HDemo.parms.vals = c(
   K,
   fs,
   lifespan,
-  Pbd
+  Pbd, 
+  paste(birth.times, collapse = " ")
 )
 
 HMove.parms.vals = c(
   paste(shift, collapse = " "),
   inc,
   max.den,
-  move.strat
+  move.strat,
+  dispersal,
+  paste(disp.dist, collapse = " "),
+  paste(disp.times, collapse = " ")
 )
 
 HContact.parms.vals = c(

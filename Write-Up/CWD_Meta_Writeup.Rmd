@@ -75,6 +75,16 @@ Once everything is initialized, the simulation will repeat until the **thyme**, 
 
 Families can relocate to a new cell. For each family on the landscape, the distance that they "relocate" is sampled from a gamma distribution (shape and scale from **shift**). If the distance they relocate is less than their home range size, **inc**, then the family does not move. If it is greater and they do relocate, they are able to move to cell within the range of the sampled distance (excluding the cell they care currently in). There are three movements strategies in deciding where to move, **move.strat**: "random" (individuals move to a random cell withing their range), "avoid" (families move to cells that are least occupied/have the lowest density), and "**max.den**" (there is a maximum threshold density and families cannot move to cells that meet or have exceeded that density).
 
+#### Dispersal (Interfamily Immigration)
+
+Individuals can relocate (disperse) between families whereby they leave their original family and join a new one. We assume that individuals can disperse at specific times during the simulation, **disp.times**, during which they disperse at rate **dispersal.rate**. Each time step, an individual has a probability of dispersing:
+
+$$
+p(dispersal.rate) = 1 - e^{-dispersal.rate}
+$$
+
+When an individual disperses, the distance they can disperse is drawn from a gamma distribution with shape and scale parameters, **disp.dist**. If there are no families within range, they do not relocate and stay within their current location and family. The location and family that the individual relocates to is randomly drawn from all possible family locations, including the current family that it is in. 
+
 #### State changes
 
 This is a large process that encapsulates many different demographic and epidemiological processes. 
@@ -88,7 +98,7 @@ $$
 $$
 Here, **K** is the maximum number of individuals that can be supported on the landscape (carrying capacity), b is the birth rate, and d is the death rate. 
 
-To simulate birth events, we calculate the density-dependent births (DDB; $b N (1 - \frac{N}{K})$) using **Pbd** as the birth rate, $b$. Because there could be instances where the population is above K, we set the DDB to have a minimum of 0, meaning the DDBR is 0 when the population is at or above K. We then sample the number of new individuals (i.e. the number of births) from a Poisson distribution with a mean of DDB. Because these individuals need to be distributed across all families, we separate these new individuals into subgroups that sum to the total number of new individuals. To control the births (e.g. so that one cell does not result in the majority of births), we set a maximum number of new individuals per group to 10. We determine which cells are assigned these groups.   
+We assume that births can only occur at specific timepoints, **birth.times**. If continuous births are needed, then the **birth.times** should be assigned for each time point. To simulate birth events, we calculate the density-dependent births (DDB; $b N (1 - \frac{N}{K})$) using **Pbd** as the birth rate, $b$. Because there could be instances where the population is above K, we set the DDB to have a minimum of 0, meaning the DDBR is 0 when the population is at or above K. We then sample the number of new individuals (i.e. the number of births) from a Poisson distribution with a mean of DDB. Because these individuals need to be distributed across all families, we separate these new individuals into subgroups that sum to the total number of new individuals. To control the births (e.g. so that one cell does not result in the majority of births), we set a maximum number of new individuals per group to 10. We determine which cells are assigned these groups.   
 
 
 ##### Natural deaths

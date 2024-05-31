@@ -57,6 +57,9 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
   #SS data
   SS.out = NULL
   
+  #dispersal data
+  disp.data.out = NULL 
+  
   ##################################
   ######## Start simulation ######## 
   ##################################
@@ -78,8 +81,10 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       ##### Dispersal ##########
       ##########################
       print("starting dispersal")
-      pop = dispersalCWD(pop, dispersal, disp.dist, disp.times, i)
-
+      dispersal.out = dispersalCWD(pop, dispersal, disp.dist, disp.times, i)
+      pop = dispersal.out[[1]]
+      disp.data.out = rbind(disp.data.out, dispersal.out[[2]])
+      
       ###############################
       ######## State Changes ######## 
       ###############################
@@ -190,7 +195,8 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
            I_locs, Spread,
            BB, Incidence,
            harvest.out, surv.out, SS.out,
-           pop.out, landscape.prions.out)
+           pop.out, landscape.prions.out,
+           disp.data.out)
 
   return(out.list)
 
@@ -212,6 +218,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
 #[[14]] Sharpshooting df
 #[[15]] Pop df (if track.pop == TRUE, all timesteps)
 #[[16]] landscape prions df
+#[[17]] dispersal data
 
 
 

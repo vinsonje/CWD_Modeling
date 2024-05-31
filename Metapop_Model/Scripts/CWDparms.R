@@ -21,10 +21,10 @@ area = grid.xmax * grid.ymax #total area of the grid
 N0 = density*area #initial population size
 K = N0 #carrying capacity for whole population
 fs = 20 #average family size
-birth.times = seq(6, 72, 12)
 
 lifespan = 12*6
 Pbd = 1.5 
+birth.times = seq(6, 72, 12)
 
 ###########################
 #host relocation parameters
@@ -38,7 +38,7 @@ move.strat = "maxden"
 #host dispersal parameters
 ##########################
 dispersal = 0.05
-disp.dist = 4 
+disp.dist = c(4, 1) 
 
 disp.times = c(1, 2, 4, 11, 12)
 # disp.times = c(10:12, 22:24, 34:36,
