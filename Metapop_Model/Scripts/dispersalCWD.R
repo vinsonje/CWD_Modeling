@@ -25,10 +25,7 @@ dispersalCWD = function(pop, dispersal, disp.dist, disp.times, thyme){
       
       dist =  sqrt((centroids[, 1] - pop.out[z, 5])^2 + (centroids[, 2] - pop.out[z, 6])^2)
       
-      poss.cells = which(dist < disp.dist)
-      fams.in.range = subset(pop.out, pop.out[,3] %in% poss.cells)
-      
-      if(length(S.disp.ind)>0){
+      if(S.disp.ind != 0){
         for(S in 1:length(S.disp.ind)){
           disp.move = rgamma(1, shape = disp.dist[1], scale = disp.dist[2])
           poss.cells = which(dist < disp.move)
@@ -44,7 +41,7 @@ dispersalCWD = function(pop, dispersal, disp.dist, disp.times, thyme){
         } #end S move loop
       } #end S if 
       
-      if(length(E.disp.ind)>0){
+      if(E.disp.ind != 0){
         for(E in 1:length(E.disp.ind)){
           disp.move = rgamma(1, shape = disp.dist[1], scale = disp.dist[2])
           poss.cells = which(dist < disp.move)
@@ -54,14 +51,13 @@ dispersalCWD = function(pop, dispersal, disp.dist, disp.times, thyme){
             E.cell.moved = sample(poss.fids, 1, replace = FALSE)
           }else{E.cell.moved = pop.out[z,12]}
           fam.ind = which(pop.out[,12] == E.cell.moved[E])
-          print(fam.ind)
           pop.out[fam.ind, 1] = pop.out[fam.ind, 1] + 1
           pop.out[fam.ind, 9] = pop.out[fam.ind, 9] + 1
           disp.out = rbind(disp.out, c(time = thyme, ind = "E", old.loc = pop.out[z,3], new.loc = pop.out[fam.ind,3]))
         } #end E move loop
       } #end E if 
       
-      if(length(I.disp.ind)>0){
+      if(I.disp.ind != 0){
         for(I in 1:length(I.disp.ind)){
           disp.move = rgamma(1, shape = disp.dist[1], scale = disp.dist[2])
           poss.cells = which(dist < disp.move)
@@ -71,7 +67,6 @@ dispersalCWD = function(pop, dispersal, disp.dist, disp.times, thyme){
             I.cell.moved = sample(poss.fids, 1, replace = FALSE)
           }else{I.cell.moved = pop.out[z, 12]}
           fam.ind = which(pop.out[,12] == I.cell.moved[I])
-          print(fam.ind)
           pop.out[fam.ind, 1] = pop.out[fam.ind, 1] + 1
           pop.out[fam.ind, 10] = pop.out[fam.ind, 10] + 1
           disp.out = rbind(disp.out, c(time = thyme, ind = "I", old.loc = pop.out[z,3], new.loc = pop.out[fam.ind,3]))
@@ -83,7 +78,6 @@ dispersalCWD = function(pop, dispersal, disp.dist, disp.times, thyme){
     
     names(disp.out) = c("time", "ind", "old.loc", "new.loc")
 } #end thyme if
-  print(disp.out)
-  
+
   return(list(pop.out, disp.out))
 }

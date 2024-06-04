@@ -69,7 +69,9 @@ SS.parms.names = c(
   "ss.shooters",
   "ss.radius", 
   "ss.eff",
-  "ss.strat"
+  "ss.strat",
+  "ss.laccess",
+  "ss.laccess.dist"
   )
 
 #####################################################################
@@ -143,7 +145,9 @@ SS.parms.mean = c(
   "radius that sharpshooting event affects", 
   "efficiency (proportion of individuals) that sharpshooting removes",
   "sharpshooting strategy; random: randomly choose where to go shootshoot from surveillance locations, 
-    priority: go to locations that have the highest number of positive detections"
+    priority: go to locations that have the highest number of positive detections",
+  "probability of having direct access to land for sharpshooting",
+  "distance that sharpshooting will happen if direct land is denied"
 )
 
 
@@ -216,7 +220,9 @@ SS.parms.vals = c(
   ss.shooters,
   ss.radius, 
   ss.eff,
-  ss.strat
+  ss.strat,
+  ss.laccess,
+  ss.laccess.dist
 )
 
 

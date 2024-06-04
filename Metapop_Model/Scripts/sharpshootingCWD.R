@@ -12,7 +12,8 @@
 #thyme = the current time of the simulation
 #########################################
 
-sharpshootingCWD = function(pop, centroids, surv.data, ss.shooters, ss.time, ss.radius, ss.eff, ss.strat, thyme){
+sharpshootingCWD = function(pop, centroids, surv.data, ss.shooters, ss.time, ss.radius, ss.eff, ss.strat, 
+                            ss.laccess, ss.laccess.dist, thyme){
   
   surv.out = surv.data
   pop.out = pop
@@ -40,7 +41,18 @@ sharpshootingCWD = function(pop, centroids, surv.data, ss.shooters, ss.time, ss.
     
     num.rem.temp = 0
     
-    ss.loc.id.now = ss.loc[q]
+    ss.access = rbinom(1, 1, ss.laccess)
+    
+    if(ss.access == 1){
+      ss.loc.id.now = ss.loc[q]
+    }else{
+      acc.dist = sqrt((centroids[ss.loc[q], 1] - centroids[, 1])^2 + (centroids[ss.loc[q], 2] - centroids[, 2])^2)
+     
+      pot.acc.cells = which(acc.dist <= ss.laccess.dist)
+      pot.acc.cells = subset(pot.acc.cells, pot.acc.cells != ss.loc[q])
+      if(length(pot.acc.cells) < 1){ss.loc.id.now = ss.loc[q]}else{ss.loc.id.now = sample(pot.acc.cells, 1)}
+      } #end else
+    
     ss.loc.xloc.now = centroids[ss.loc.id.now, 1]
     ss.loc.yloc.now = centroids[ss.loc.id.now, 2]
     

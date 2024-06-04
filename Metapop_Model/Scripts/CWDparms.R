@@ -23,7 +23,7 @@ K = N0 #carrying capacity for whole population
 fs = 20 #average family size
 
 lifespan = 12*6
-Pbd = 1.5 
+Pbd = 2.5
 birth.times = seq(6, 72, 12)
 
 ###########################
@@ -47,17 +47,17 @@ disp.times = c(1, 2, 4, 11, 12)
 ###########################
 #Epidemiological parameters
 ###########################
-I0 = 0
+I0 = 1
 
 shed = 10 #the shedding rate of infected deer (mean of poisson distribution)
-lat.period = 3
+lat.period = 16
 inf.period = 6
 
 #########################
-#Direct Tranmission Parameters
+#Direct Transmission Parameters
 #########################
-F1 = 0.7381
-B1 = 0.4
+F1 = 0.07381
+B1 = 0.04
 
 # F1 = 0
 # B1 = 0
@@ -112,9 +112,11 @@ F2i_B = F2i$coef[[2]]
 ss.times = c(25, 45)
 # ss.times = 0
 ss.shooters = 10
-ss.radius = 5.0
+ss.radius = 1.0
 ss.eff = 0.05
 ss.strat = "priority"
+ss.laccess = 0.8
+ss.laccess.dist = 0.5
 
 ######################
 #Harvesting parameters

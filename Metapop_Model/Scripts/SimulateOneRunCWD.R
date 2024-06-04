@@ -69,7 +69,7 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
     # if (any(pop[, 9, drop=FALSE]!=0|pop[, 10, drop=FALSE]!=0)){
     if (any(pop[, 9, drop=FALSE]>-999|pop[, 10, drop=FALSE]>-999|pop[, 8, drop=FALSE]>-999)){
         
-      print(i)
+      print(paste("timestep:",i, sep = " "))
   
       ##########################
       ######## Movement ######## 
@@ -146,7 +146,8 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       #### Sharpshooting ############
       ###############################
       print("starting sharpshooting")
-      SS.event.out = sharpshootingCWD(pop, centroids, surv.yearly, ss.shooters, ss.times, ss.radius, ss.eff, ss.strat, i)
+      SS.event.out = sharpshootingCWD(pop, centroids, surv.yearly, ss.shooters, ss.times, ss.radius, ss.eff, ss.strat, 
+                                      ss.laccess, ss.laccess.dist, i)
       
       pop = SS.event.out[[1]]
       surv.yearly = SS.event.out[[2]]
@@ -175,8 +176,6 @@ SimulateOneRunCWD = function(pop, landscape.prions, centroids, track.pop = TRUE)
       landscape.prions.temp = data.frame(landscape.prions, time = rep(i, dim(landscape.prions)[1]))
       landscape.prions.out = rbind(landscape.prions.out, landscape.prions.temp)
       
-      
-      print(summary.pop[[6]])
     }else{print("Exiting loop, no infections")} #if any infected closing bracket/else
     
   } #for timestep closing bracket

@@ -198,7 +198,7 @@ To determine where to sharpshoot, we use the individuals that are harvested to s
 
 #### Sharpshooting
 
-Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Before running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location where it occurs. But rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**). We also assign a strategy (**ss.strat**) for sharpshooting: **random** (randomly choose where to go shootshoot for surveillance), **priority** (go to locations that have the highest number of positive identifications).
+Sharpshooting, much like harvesting,  removes individuals from the landscape. However, because we have surveillance about where infected individuals are located, we decided where to sharpshoot based on the locations from the surveillance. Before running a simulation, we assign when sharp shooting events occur (**ss.time**). Like harvesting, sharpshooting affects all the individuals within a radius (**ss.radius**) around the location where it occurs. But rather than assigning a discrete number of individuals removed, a proportion of all individuals within the radius are removed (**ss.eff**). We also assign a strategy (**ss.strat**) for sharpshooting: **random** (randomly choose where to go shootshoot for surveillance), **priority** (go to locations that have the highest number of positive identifications). Since there may be situations where there is not direct access to areas that have had positive identifications, we can assign the probability of direct access to an area to do sharpshooting, **ss.laccess**. If access is denied, then a cell within **ss.laccess.dist** is selected. 
 
 
 ### Tracking statistics/measures, Summarizing dynamics
@@ -228,7 +228,7 @@ include_graphics("C:/Users/SIU856560341/Desktop/CWD_Modeling/Write-Up/Images/Met
 
 ```{r "parms table", echo = FALSE}
 source(paste0(getwd(), "/parms_table.R"))
-parm.df = data.frame(parmeter = all.parm.names, meaning = all.parm.mean, value = all.parm.vals)
+parm.df = data.frame(parameter = all.parm.names, meaning = all.parm.mean, value = all.parm.vals)
 
 kable(parm.df, "html", caption = "Table 1. Table of parameters, meaning and values to generate the example dynamics.") %>%   kable_styling(full_width = F) %>%
   column_spec(1, width = '1in') %>% column_spec(2, width = '4in') %>% column_spec(3, width = '4in')

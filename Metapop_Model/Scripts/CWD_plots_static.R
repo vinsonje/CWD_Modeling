@@ -18,7 +18,7 @@ CWD.plots.static = function(sim_output, grid.xmax, grid.ymax, thyme){
     theme_cowplot() + xlab("time") + ylab("proportion of population")
   
   
-  spread.plot = ggplot() + geom_line(aes(x = 1:thyme, sim_output[[9]][,1]), color = "black", lwd = 2.0) + 
+  spread.plot = ggplot() + geom_line(aes(x = 1:thyme, sim_output[[9]][,3]), color = "black", lwd = 2.0) + 
     theme_cowplot() + xlab("time") + ylab("spread (KM)")
   
   incidence.plot = ggplot() + geom_line(aes(x = 1:thyme, sim_output[[11]]), color = "black", lwd = 2.0) + 
